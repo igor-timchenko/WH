@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="red">#F44336</color>
+    <color name="backgroundGray">#F8F8F8</color>
+
+    <color name="disabledButtonColor">#ddddde</color>
+    <color name="disabledButtonTextColor">#949395</color>
+
+    <color name="enabledButtonColor">#505AA4</color>
+    <color name="enabledButtonTextColor">#FFFFFF</color>
+    <color name="hintTextColor">#C4C4C4</color>
+    <color name="textColor">#262626</color>
+    <color name="gray">#B0B0B0</color>
+</resources>

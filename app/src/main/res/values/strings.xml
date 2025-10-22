@@ -1,0 +1,33 @@
+<resources>
+    <string name="app_name">Поставщик КОНТИНЕНТ</string>
+    <string name="phoneHint">(983) 255-25-25</string>
+    <string name="codeHint">0000</string>
+    <string name="buttonGetCode">Код</string>
+    <string name="buttonCheckCode">Войти</string>
+    <string name="auth_code">Код подтверждения</string>
+    <string name="phone_number">Введите номер телефона</string>
+    <string name="company_logo_cd">Логотип компании</string>
+    <string name="app_version">Версия: %s</string>
+    <string name="sms_sent_message">СМС код отправлен на номер телефона</string>
+    <string name="errorSendingSMS">Ошибка отправки СМС</string>
+    <string name="errorCheckingSMS">Ошибка проверки СМС</string>
+    <string name="ok">Ок</string>
+    <string name="error_card_title">Возникли ошибки!</string>
+    <string name="retry_btn_label">Повторить</string>
+    <string name="cd_exit_account_btn">Кнопка выхода из аккаунта</string>
+    <string name="cd_user_avatar">Аватар пользователя</string>
+    <string name="cd_open_division_btn">Кнопка открытия площадки</string>
+    <string name="label_divisions_list_empty">Список площадок пуст</string>
+    <string name="label_scan">Сканирование</string>
+    <string name="cd_scan_button">Кнопка сканнирования</string>
+    <string name="title_places_exp">Места хранения (%d шт.)</string>
+    <string name="label_no_product_places">Места хранения отсутствуют</string>
+    <string name="cd_product_image">Картинка товара</string>
+    <string name="label_leftovers">Остаток:</string>
+    <string name="label_leftovers_reserved">Резерв:</string>
+    <string name="label_supplier_batch">Партия:</string>
+    <string name="label_production_date">Дата производства:</string>
+    <string name="label_best_before">Срок годности:</string>
+    <string name="scanned_label">Отсканировано: %s</string>
+    <string name="no_places_found">Ничего не найдено</string>
+</resources>

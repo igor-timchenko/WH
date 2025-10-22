@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/loginFragment">
+
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="ru.contlog.mobile.helper.fragments.LoginFragment"
+        android:label="LoginFragment" >
+        <action
+            android:id="@+id/action_loginFragment_to_workSitesFragment"
+            app:destination="@id/workSitesFragment"
+            app:launchSingleTop="true"
+            app:popUpTo="@id/nav_graph"
+            app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/productInfoFragment"
+        android:name="ru.contlog.mobile.helper.fragments.ProductInfoFragment"
+        android:label="ProductInfoFragment" >
+        <argument
+            android:name="division"
+            app:argType="ru.contlog.mobile.helper.model.Division" />
+    </fragment>
+    <fragment
+        android:id="@+id/workSitesFragment"
+        android:name="ru.contlog.mobile.helper.fragments.DivisionsListFragment"
+        android:label="WorkSitesFragment" >
+        <action
+            android:id="@+id/action_workSitesFragment_to_productInfoFragment"
+            app:destination="@id/productInfoFragment"
+            app:launchSingleTop="true" />
+        <action
+            android:id="@+id/action_workSitesFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+    </fragment>
+</navigation>
