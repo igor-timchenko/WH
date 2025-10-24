@@ -105,8 +105,6 @@ class ProductInfoFragment : Fragment() {
         }
 
         binding.productsList.adapter = adapter
-
-
     }
 
     private fun doScan() {
@@ -129,5 +127,4 @@ class ProductInfoFragment : Fragment() {
             }
         }
     }
-
 }

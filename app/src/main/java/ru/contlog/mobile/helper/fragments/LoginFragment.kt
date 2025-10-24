@@ -13,6 +13,7 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import ru.contlog.mobile.helper.BuildConfig
 import ru.contlog.mobile.helper.R
 import ru.contlog.mobile.helper.TextInputListener
 import ru.contlog.mobile.helper.databinding.FragmentLoginBinding
@@ -69,6 +70,7 @@ class LoginFragment : Fragment() {
         }
 
         binding.phoneInput.setText(viewModel.login)
+        binding.versionLabel.text = getString(R.string.app_version, BuildConfig.VERSION_NAME)
     }
 
     private fun getCode() {
