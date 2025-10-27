@@ -1,5 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    Селектор цвета для кнопок (или других View), изменяющий цвет в зависимости от состояния enabled.
+
+    Используется как значение android:textColor или android:backgroundTint в макетах.
+    Пример подключения:
+    <Button
+        android:textColor="@color/button_text_color_selector"
+        ... />
+-->
+
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_enabled="false" android:color="@color/disabledButtonColor" />
-    <item android:color="@color/enabledButtonColor" />
+
+    <!--
+        Правило для состояния, когда кнопка НЕДОСТУПНА (enabled = false).
+        Например, когда поля формы не заполнены и кнопка "Отправить" отключена.
+    -->
+    <item
+        android:state_enabled="false"
+        android:color="@color/disabledButtonColor" />
+
+    <!--
+        Правило по умолчанию — применяется во всех остальных состояниях
+        (в том числе когда кнопка активна: enabled = true).
+
+        ⚠️ Важно: это правило ДОЛЖНО быть последним, так как селектор
+        применяет первый подходящий item. Если поставить его выше,
+        правило для disabled никогда не сработает.
+    -->
+    <item
+        android:color="@color/enabledButtonColor" />
+
 </selector>

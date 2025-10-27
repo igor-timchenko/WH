@@ -1,23 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!--
+    Основной макет главной активности приложения.
+    Использует ConstraintLayout как корневой контейнер и FragmentContainerView
+    для управления навигацией через Navigation Component.
+-->
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F8F8F8"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"> <!-- Указывает, к какой активности относится макет -->
 
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/fragment_container_view"
-        android:name="androidx.navigation.fragment.NavHostFragment"
-        app:navGraph="@navigation/nav_graph"
-        app:defaultNavHost="true"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:layout="@layout/fragment_login"/>
+    <!--
+        Контейнер для фрагментов, управляемый Navigation Component.
+        Это современный способ организации навигации в приложении:
+        - Все экраны реализованы как фрагменты,
+        - Переходы между ними управляются через nav_graph.
+    -->
+<androidx.fragment.app.FragmentContainerView
+android:id="@+id/fragment_container_view"
+android:name="androidx.navigation.fragment.NavHostFragment"
+app:navGraph="@navigation/nav_graph"
+    app:defaultNavHost="true"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent"
+    tools:layout="@layout/fragment_login" />   <!-- Предпросмотр в Android Studio: показывает login-фрагмент -->
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>

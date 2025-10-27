@@ -1,11 +1,10 @@
-// Пакет основного приложения
-package ru.contlog.mobile.helper
+package ru.contlog.mobile.helper.utils
 
 import android.text.Editable
 import android.text.TextWatcher
 
 /**
- * Упрощённая обёртка над [TextWatcher] для удобной реакции на изменения текста в EditText.
+ * Упрощённая обёртка над [android.text.TextWatcher] для удобной реакции на изменения текста в EditText.
  *
  * Позволяет избежать многословного создания анонимного TextWatcher'а и сосредоточиться
  * только на логике обработки изменений текста.

@@ -1,5 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    Селектор цвета ТЕКСТА для кнопок (или других TextView-элементов),
+    который автоматически меняет цвет в зависимости от состояния enabled.
+
+    Назначение: улучшить UX, визуально показывая, когда кнопка неактивна.
+
+    Пример подключения в макете:
+    <Button
+        android:textColor="@color/button_text_color_selector"
+        ... />
+-->
+
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_enabled="false" android:color="@color/disabledButtonTextColor" />
-    <item android:color="@color/enabledButtonTextColor" />
+
+    <!--
+        Цвет текста, когда кнопка НЕДОСТУПНА (android:enabled="false").
+        Обычно более светлый или полупрозрачный, чтобы визуально "затушить" кнопку.
+    -->
+    <item
+        android:state_enabled="false"
+        android:color="@color/disabledButtonTextColor" />
+
+    <!--
+        Цвет текста по умолчанию — когда кнопка активна (enabled="true")
+        или находится в любом другом состоянии.
+
+        ⚠️ ВАЖНО: это правило должно быть ПОСЛЕДНИМ в селекторе,
+        потому что Android применяет ПЕРВЫЙ подходящий <item>.
+        Если поменять местами — disabled-состояние никогда не сработает.
+    -->
+    <item
+        android:color="@color/enabledButtonTextColor" />
+
 </selector>
