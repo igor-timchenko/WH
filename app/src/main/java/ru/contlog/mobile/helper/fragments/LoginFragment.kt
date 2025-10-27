@@ -17,7 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ru.contlog.mobile.helper.BuildConfig
 import ru.contlog.mobile.helper.R
-import ru.contlog.mobile.helper.utils.TextInputListener
+import ru.contlog.mobile.helper.TextInputListener
 import ru.contlog.mobile.helper.databinding.FragmentLoginBinding
 import ru.contlog.mobile.helper.repo.Api
 import ru.contlog.mobile.helper.repo.AppPreferencesRepository
