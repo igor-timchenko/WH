@@ -31,4 +31,5 @@
     <string name="scanned_label">Отсканировано: %s</string>
     <string name="no_places_found">Ничего не найдено</string>
     <string name="todo">TODO</string>
+    <string name="scan">Сканировать</string>
 </resources>
