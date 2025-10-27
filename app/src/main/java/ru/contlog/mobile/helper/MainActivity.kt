@@ -37,5 +37,6 @@ class MainActivity : AppCompatActivity() {
         if (viewModel.apiAuthData != null) {
             navController.navigate(R.id.action_loginFragment_to_workSitesFragment)
         }
+        // Мой комментарий
     }
 }
