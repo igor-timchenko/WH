@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/mHome"
+        android:enabled="true"
+        android:icon="@drawable/outline_garage_home_24"
+        android:title="Главная"/>
+    <item
+        android:id="@+id/mProfile"
+        android:enabled="true"
+        android:icon="@drawable/outline_account_box_24"
+        android:title="Профиль"/>
+</menu>
