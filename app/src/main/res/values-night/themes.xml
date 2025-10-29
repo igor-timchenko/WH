@@ -1,5 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.SupplierContinent" parent="Theme.Material3.Light.NoActionBar">
+        <item name="android:statusBarColor">?attr/colorPrimary</item>
     </style>
 </resources>

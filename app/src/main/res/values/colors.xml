@@ -8,6 +8,11 @@
     <color name="disabledButtonColor">#ddddde</color>
     <color name="disabledButtonTextColor">#949395</color>
 
+
+    <color name="button_primary">#2196F3</color>
+    <color name="background_primary">#F0F0F0</color>
+    <color name="gray1">#CACACA</color>
+    <color name="statusBarColor">#CACACA</color>
     <color name="enabledButtonColor">#505AA4</color>
     <color name="enabledButtonTextColor">#FFFFFF</color>
     <color name="hintTextColor">#C4C4C4</color>

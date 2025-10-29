@@ -22,6 +22,9 @@
         <argument
             android:name="division"
             app:argType="ru.contlog.mobile.helper.model.Division" />
+        <action
+            android:id="@+id/action_productInfoFragment_to_workSitesFragment"
+            app:destination="@id/workSitesFragment" />
     </fragment>
     <fragment
         android:id="@+id/workSitesFragment"
@@ -32,7 +35,18 @@
             app:destination="@id/productInfoFragment"
             app:launchSingleTop="true" />
         <action
-            android:id="@+id/action_workSitesFragment_to_loginFragment"
+            android:id="@+id/action_workSitesFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="ru.contlog.mobile.helper.fragments.ProfileFragment"
+        android:label="ProfileFragment" >
+        <action
+            android:id="@+id/action_profileFragment_to_workSitesFragment"
+            app:destination="@id/workSitesFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_loginFragment"
             app:destination="@id/loginFragment" />
     </fragment>
 </navigation>

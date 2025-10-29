@@ -14,7 +14,7 @@
     <string name="ok">Ок</string>
     <string name="error_card_title">Возникли ошибки!</string>
     <string name="retry_btn_label">Повторить</string>
-    <string name="cd_exit_account_btn">Кнопка выхода из аккаунта</string>
+    <string name="exit_account_btn">Выйти из аккаунта</string>
     <string name="cd_user_avatar">Аватар пользователя</string>
     <string name="cd_open_division_btn">Кнопка открытия площадки</string>
     <string name="label_divisions_list_empty">Список площадок пуст</string>
@@ -30,6 +30,6 @@
     <string name="label_best_before">Срок годности:</string>
     <string name="scanned_label">Отсканировано: %s</string>
     <string name="no_places_found">Ничего не найдено</string>
+    <string name="do_scan_btn_label">Начать сканирование</string>
     <string name="todo">TODO</string>
-    <string name="scan">Сканировать</string>
 </resources>
