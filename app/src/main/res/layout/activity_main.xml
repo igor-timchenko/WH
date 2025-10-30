@@ -7,7 +7,6 @@
     android:layout_height="match_parent"
     android:background="#F8F8F8"
     tools:context=".MainActivity"
-    android:fitsSystemWindows="true"
     >
 
     <androidx.fragment.app.FragmentContainerView
@@ -21,6 +20,21 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:layout="@layout/fragment_login"/>
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_navigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:backgroundTint="@color/white"
+        app:elevation="8dp"
+        app:itemIconTint="@color/button_background_tint"
+        app:itemTextColor="@color/button_background_tint"
+        app:itemRippleColor="@color/bottom_nav_selected"
+        app:itemActiveIndicatorStyle="@style/Theme.BottomNavigationView.ActiveIndicator"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:menu="@menu/bottom_navigation_menu" />
 
 <!--    <TextView-->
 <!--        android:id="@+id/versionLabel"-->

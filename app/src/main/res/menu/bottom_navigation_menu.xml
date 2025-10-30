@@ -21,8 +21,7 @@
         android:id="@+id/mHome"
         android:enabled="true"
         android:icon="@drawable/outline_garage_home_24"
-        android:title="Главная"
-        tools:ignore="HardcodedText" />
+        android:title="@string/menu_main" />
 
     <!--
       Пункт меню "Профиль".
@@ -34,7 +33,6 @@
         android:id="@+id/mProfile"
         android:enabled="true"
         android:icon="@drawable/sharp_account_circle_24"
-        android:title="Профиль"
-        tools:ignore="HardcodedText" />
+        android:title="@string/menu_profile" />
 
 </menu>

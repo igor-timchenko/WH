@@ -44,8 +44,6 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        Log.i("asdf2", "onViewCreated: ${viewModel.userData.value}")
-
         viewModel.userData.observe(viewLifecycleOwner) { userData ->
             if (userData == null) {
                 binding.userInfoCard.visibility = View.GONE

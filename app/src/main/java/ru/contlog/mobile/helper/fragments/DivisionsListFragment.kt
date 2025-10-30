@@ -44,17 +44,6 @@ class DivisionsListFragment : Fragment() {
 
         Log.i("asdf1", "onViewCreated: ${viewModel.userData.value}")
 
-        binding.bottomNavigation.setOnItemSelectedListener { mi ->
-            when (mi.itemId) {
-                R.id.mHome -> {}
-                R.id.mProfile -> {
-                    findNavController().navigate(R.id.action_workSitesFragment_to_profileFragment)
-                }
-            }
-
-            true
-        }
-
         viewModel.errors.observe(viewLifecycleOwner) { errors ->
             if (errors.isEmpty()) {
                 binding.errorsCard.visibility = View.GONE

@@ -18,4 +18,7 @@
     <color name="hintTextColor">#C4C4C4</color>
     <color name="textColor">#262626</color>
     <color name="gray">#B0B0B0</color>
+
+    <color name="transparent">#00000000</color>
+    <color name="bottom_nav_selected">#4C2196F3</color>
 </resources>

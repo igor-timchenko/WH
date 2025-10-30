@@ -47,10 +47,15 @@ class ProductsRVAdapter(val onChildScrollRequested: (Boolean) -> Unit) :
         notifyItemRangeChanged(0, productsList.size)
     }
 
-    class VH(private val binding: ItemProductBinding, private val onChildScrollRequested: (Boolean) -> Unit) :
+    class VH(
+        private val binding: ItemProductBinding,
+        private val onChildScrollRequested: (Boolean) -> Unit
+    ) :
         RecyclerView.ViewHolder(binding.root) {
         @SuppressLint("ClickableViewAccessibility")
         fun bind(product: Product) {
+            binding.expansionIndicator.visibility = View.VISIBLE
+
             binding.productCode.text = product.productCode
             binding.barcodeCode.text = product.barcodeCode.toString()
             binding.productName.text = product.productLinkString
@@ -66,6 +71,7 @@ class ProductsRVAdapter(val onChildScrollRequested: (Boolean) -> Unit) :
                         onChildScrollRequested(false)
                         v.parent.requestDisallowInterceptTouchEvent(true)
                     }
+
                     MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                         onChildScrollRequested(true)
                         v.parent.requestDisallowInterceptTouchEvent(false)
@@ -115,7 +121,8 @@ class ProductsRVAdapter(val onChildScrollRequested: (Boolean) -> Unit) :
                     })
             }
 
-            Glide.with(binding.root).load(product.imageSrc).into(binding.productImage)
+            Glide.with(binding.root).load(product.imageSrc)
+                .error(R.drawable.baseline_error_outline_24).into(binding.productImage)
         }
     }
 }

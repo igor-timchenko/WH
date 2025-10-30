@@ -32,4 +32,6 @@
     <string name="no_places_found">Ничего не найдено</string>
     <string name="do_scan_btn_label">Начать сканирование</string>
     <string name="todo">TODO</string>
+    <string name="menu_main">Главная</string>
+    <string name="menu_profile">Профиль</string>
 </resources>
