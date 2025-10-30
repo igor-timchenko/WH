@@ -6,7 +6,8 @@
     android:layout_height="wrap_content"
     android:layout_margin="4dp"
     android:fitsSystemWindows="true"
-    >
+    android:background="@color/white"
+    android:backgroundTint="@color/white">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"

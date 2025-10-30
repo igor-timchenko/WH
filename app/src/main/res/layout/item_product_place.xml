@@ -6,7 +6,8 @@
     android:layout_height="wrap_content"
     android:paddingBottom="16dp"
     android:fitsSystemWindows="true"
-    >
+    android:background="@color/white"
+    android:backgroundTint="@color/white">
 
     <TextView
         android:id="@+id/placeName"
