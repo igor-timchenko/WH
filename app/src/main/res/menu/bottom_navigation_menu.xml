@@ -1,14 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  Корневой элемент <menu> определяет набор пунктов меню,
+  обычно используется для ActionBar, NavigationView или BottomNavigationView.
+-->
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    android:fitsSystemWindows="true">
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!--
+      Пункт меню "Главная".
+
+      - android:id: уникальный идентификатор для навигации (например, в Navigation Component).
+      - android:icon: иконка из папки res/drawable. Убедитесь, что файл существует.
+      - android:title: текст пункта меню.
+        ❗ Сейчас текст "захардкожен". В production-коде его нужно вынести в strings.xml
+          для поддержки локализации и удобства поддержки.
+      - android:enabled="true": избыточен — по умолчанию true.
+      - tools:ignore="HardcodedText": подавляет предупреждение в IDE, но не решает проблему.
+    -->
     <item
         android:id="@+id/mHome"
         android:enabled="true"
         android:icon="@drawable/outline_garage_home_24"
-        android:title="Главная"/>
+        android:title="Главная"
+        tools:ignore="HardcodedText" />
+
+    <!--
+      Пункт меню "Профиль".
+
+      То же самое: текст лучше вынести в ресурсы, enabled можно убрать,
+      а tools:ignore оставить временно, если ещё не готовы переносить строки.
+    -->
     <item
         android:id="@+id/mProfile"
         android:enabled="true"
         android:icon="@drawable/sharp_account_circle_24"
-        android:title="Профиль"/>
+        android:title="Профиль"
+        tools:ignore="HardcodedText" />
+
 </menu>

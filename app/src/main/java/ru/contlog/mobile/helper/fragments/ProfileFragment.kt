@@ -46,10 +46,6 @@ class ProfileFragment : Fragment() {
 
         Log.i("asdf2", "onViewCreated: ${viewModel.userData.value}")
 
-        binding.profileToolbar.setNavigationOnClickListener {
-            findNavController().navigate(R.id.action_profileFragment_to_workSitesFragment)
-        }
-
         viewModel.userData.observe(viewLifecycleOwner) { userData ->
             if (userData == null) {
                 binding.userInfoCard.visibility = View.GONE
