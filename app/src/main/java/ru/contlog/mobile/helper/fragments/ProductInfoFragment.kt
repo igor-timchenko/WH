@@ -100,12 +100,8 @@ class ProductInfoFragment : Fragment() {
             }
         }
 
-        productViewModel.scannedCode.observe(viewLifecycleOwner) { scannedCode ->
-            if (scannedCode == null) {
-                binding.productInfoToolbar.subtitle = ""
-            } else {
-                binding.productInfoToolbar.subtitle = getString(R.string.scanned_label, scannedCode)
-            }
+        productViewModel.scannedCode.observe(viewLifecycleOwner) { code ->
+            binding.productInfoToolbar.subtitle = code?.let { getString(R.string.scanned_label, it) }
         }
 
         binding.productsList.adapter = adapter

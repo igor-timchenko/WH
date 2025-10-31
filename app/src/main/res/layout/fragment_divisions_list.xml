@@ -12,6 +12,32 @@
         android:layout_height="match_parent"
         android:background="#F1F1F1">
 
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/productInfoToolbar4"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@color/gray1"
+            android:minHeight="?attr/actionBarSize"
+            android:theme="?attr/actionBarTheme"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/productName4"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="16dp"
+            android:text="Выбирите площадку для начала сканирования"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="@+id/productInfoToolbar4"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/productInfoToolbar4"
+            tools:ignore="HardcodedText"
+            tools:text="Выбирите площадку для начала сканирования" />
+
         <androidx.cardview.widget.CardView
             android:id="@+id/errorsCard"
             android:layout_width="0dp"
@@ -63,7 +89,7 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="64dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="16dp"
             android:visibility="gone"
@@ -79,7 +105,7 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="64dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
             android:gravity="center"
@@ -87,8 +113,10 @@
             android:visibility="gone"
             app:layout_constraintBottom_toTopOf="@+id/errorsCard"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0"
             tools:visibility="visible">
 
             <ImageView
