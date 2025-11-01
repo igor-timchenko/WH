@@ -92,41 +92,10 @@
             android:layout_height="wrap_content"
             android:autofillHints=""
             android:ems="10"
+            android:maxLength="4"
             android:hint="@string/codeHint"
             android:inputType="number" />
     </com.google.android.material.textfield.TextInputLayout>
-
-    <Button
-        android:id="@+id/getCodeButton"
-        style="@style/MyCustomButtonStyle"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
-        android:enabled="false"
-        android:text="@string/buttonGetCode"
-        android:textSize="12sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/guideline"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="@+id/codeInputTIL"
-        app:layout_constraintTop_toBottomOf="@+id/codeSentMessage"
-        app:layout_constraintVertical_bias="0.0" />
-
-    <Button
-        android:id="@+id/checkCodeButton"
-        style="@style/MyCustomButtonStyle"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:enabled="false"
-        android:text="@string/buttonCheckCode"
-        android:textSize="12sp"
-        app:layout_constraintBottom_toBottomOf="@+id/getCodeButton"
-        app:layout_constraintEnd_toEndOf="@+id/codeInputTIL"
-        app:layout_constraintStart_toStartOf="@+id/guideline"
-        app:layout_constraintTop_toTopOf="@+id/getCodeButton" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline"
@@ -140,7 +109,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="@string/sms_sent_message"
+        android:text="@string/smsSentTo"
         android:textAlignment="center"
         android:textColor="#48FF00"
         android:textStyle="bold"

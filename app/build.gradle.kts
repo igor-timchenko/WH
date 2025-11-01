@@ -59,6 +59,7 @@ dependencies {
     implementation(libs.androidx.recyclerview)
     implementation(libs.zxing.android.embedded)
     implementation(libs.glide)
+    implementation(libs.androidx.ui.test)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

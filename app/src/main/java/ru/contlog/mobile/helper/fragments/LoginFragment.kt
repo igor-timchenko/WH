@@ -1,144 +1,163 @@
 package ru.contlog.mobile.helper.fragments
 
 import android.os.Bundle
+import android.text.Editable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels // Общий ViewModel для всей активности
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ru.contlog.mobile.helper.R
-import ru.contlog.mobile.helper.utils.TextInputListener
 import ru.contlog.mobile.helper.databinding.FragmentLoginBinding
 import ru.contlog.mobile.helper.repo.Api
 import ru.contlog.mobile.helper.vm.AppViewModel
 
 class LoginFragment : Fragment() {
     private lateinit var binding: FragmentLoginBinding
-
-    // Используется activity-scoped ViewModel, чтобы данные (логин, токен) сохранялись
-    // при переходе между фрагментами в рамках одной активности.
     private val viewModel: AppViewModel by activityViewModels()
+
+    // Флаг: SMS уже запрашивался (чтобы не отправлять 10 раз при вводе)
+    private var smsRequested = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Инициализация ViewBinding — современный способ доступа к UI-элементам без findViewById.
+    ): View {
         binding = FragmentLoginBinding.inflate(inflater)
-
-        // Настройка слушателей и начального состояния UI.
         bind()
-
         return binding.root
     }
 
     private fun bind() {
-        // Слушатель изменения номера телефона: включает кнопку "Получить код",
-        // только если введено ровно 10 цифр.
-        binding.phoneInput.addTextChangedListener(TextInputListener { s ->
-            val phoneOk = s != null && Regex("\\d{10}").matches(s)
-            binding.getCodeButton.isEnabled = phoneOk
+        // Поле кода изначально заблокировано
+        binding.codeInput.isEnabled = false
+
+        // Слушатель номера телефона
+        binding.phoneInput.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
+            override fun afterTextChanged(s: Editable?) {
+                val phone = s?.toString()?.trim() ?: ""
+                val isPhoneValid = phone.length == 10 && phone.all { it.isDigit() }
+
+
+                if (isPhoneValid && !smsRequested) {
+                    smsRequested = true
+                    requestSmsCode(phone)
+                }
+
+                // Если пользователь удаляет цифры — сбрасываем состояние
+                if (phone.length < 10 && smsRequested) {
+                    resetState()
+                }
+            }
         })
 
-        // Слушатель ввода кода: включает кнопку "Проверить", если поле не пустое.
-        binding.codeInput.addTextChangedListener(TextInputListener { s ->
-            binding.checkCodeButton.isEnabled = !s.isNullOrBlank()
+        // Слушатель кода
+        binding.codeInput.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
+            override fun afterTextChanged(s: Editable?) {
+                val code = s?.toString()?.trim() ?: ""
+                if (code.length == 4 && code.all { it.isDigit() }) {
+                    verifyCode(code)
+                }
+            }
         })
-
-        // Обработка нажатия "Получить код"
-        binding.getCodeButton.setOnClickListener {
-            getCode()
-        }
-
-        // Обработка нажатия "Проверить код"
-        binding.checkCodeButton.setOnClickListener {
-            checkCode()
-        }
-
-        // Подгружаем сохранённый номер из ViewModel (на случай поворота экрана или возврата).
-        binding.phoneInput.setText(viewModel.login)
     }
 
-    private fun getCode() {
-        // Скрываем сообщение "Код отправлен", если оно было показано ранее.
+    private fun requestSmsCode(phoneNumber: String) {
         binding.codeSentMessage.visibility = View.INVISIBLE
 
-        val phoneNumber = binding.phoneInput.text.toString().trim()
-
-        // Проверка длины номера (должно быть 10 цифр).
-        if (phoneNumber.length != 10) {
-            Toast.makeText(requireContext(), "Введите 10 цифр номера телефона", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        // Запуск сетевого запроса в фоновом потоке (IO)
         lifecycleScope.launch(Dispatchers.IO) {
-            val result = Api.Auth.getSms("7$phoneNumber") // Добавляем код страны "7" (Россия/Казахстан)
+            val result = Api.Auth.getSms("7$phoneNumber")
 
-            // Возвращаемся в главный поток для обновления UI
             launch(Dispatchers.Main) {
                 result.fold(
                     onSuccess = {
-                        // Успешная отправка SMS → показываем сообщение
+                        val formattedPhone = formatPhoneNumber("7$phoneNumber")
+                        binding.codeSentMessage.text = getString(R.string.smsSentTo, formattedPhone)
                         binding.codeSentMessage.visibility = View.VISIBLE
+                        binding.codeInput.isEnabled = true
+                        binding.codeInput.requestFocus()
                     },
                     onFailure = { throwable ->
-                        // Ошибка → показываем диалог с сообщением
-                        MaterialAlertDialogBuilder(requireContext())
-                            .setTitle(getString(R.string.errorSendingSMS))
-                            .setMessage(throwable.message ?: "Неизвестная ошибка")
-                            .setPositiveButton(getString(R.string.ok), null)
-                            .show()
+                        // Показываем ошибку В ТОМ ЖЕ TextView, что и сообщение об отправке
+                        binding.codeSentMessage.text = "Номер телефона не заригистрирован в компании, обратить в отдел персонала"
+                        binding.codeSentMessage.setTextColor(requireContext().getColor(android.R.color.holo_red_dark))
+                        binding.codeSentMessage.visibility = View.VISIBLE
+
+                        binding.codeInput.setText("")
+                        binding.codeInput.requestFocus()
                     }
                 )
             }
         }
     }
 
-    private fun checkCode() {
+    private fun verifyCode(code: String) {
         val phoneNumber = binding.phoneInput.text.toString().trim()
-        val code = binding.codeInput.text.toString().trim()
+        if (phoneNumber.length != 10 || !phoneNumber.all { it.isDigit() }) return
 
-        // Валидация ввода
-        if (phoneNumber.length != 10) {
-            Toast.makeText(requireContext(), "Введите 10 цифр номера телефона", Toast.LENGTH_SHORT).show()
-            return
-        }
-        if (code.isEmpty()) {
-            Toast.makeText(requireContext(), "Введите код", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        // Проверка кода на сервере
         lifecycleScope.launch(Dispatchers.IO) {
             val result = Api.Auth.checkSms("7$phoneNumber", code)
 
             launch(Dispatchers.Main) {
                 result.fold(
                     onSuccess = { apiAuthData ->
-                        // Сохраняем данные авторизации в ViewModel (доступны всей активности)
                         viewModel.login = phoneNumber
                         viewModel.apiAuthData = apiAuthData
-
-                        // Переход к следующему экрану (очистка стека сделана в nav_graph.xml)
                         findNavController().navigate(R.id.action_loginFragment_to_workSitesFragment)
                     },
                     onFailure = { throwable ->
+                        // Ошибка кода — очищаем поле и даём ввести заново
+                        binding.codeInput.setText("")
                         MaterialAlertDialogBuilder(requireContext())
-                            .setTitle(getString(R.string.errorCheckingSMS))
-                            .setMessage(throwable.message ?: "Неверный код или ошибка сети")
-                            .setPositiveButton(getString(R.string.ok), null)
+                            .setTitle("Неверный код")
+                            .setMessage("Код неправильный, повторите")
+                            .setPositiveButton("OK") { _, _ ->
+                                binding.codeInput.requestFocus()
+                            }
                             .show()
                     }
                 )
             }
+        }
+    }
+
+    private fun resetState() {
+        smsRequested = false
+        binding.codeSentMessage.visibility = View.INVISIBLE
+        binding.codeInput.isEnabled = false
+        binding.codeInput.setText("")
+    }
+
+    // ✅ ИСПРАВЛЕННАЯ МАСКА: +7 (XXX) XXX-XX-XX
+    private fun formatPhoneNumber(raw: String): String {
+        val digits = raw.replace(Regex("\\D"), "")
+        val trimmed = if (digits.length > 11) digits.substring(0, 11) else digits
+
+        return when (trimmed.length) {
+            0 -> ""
+            1 -> "+$trimmed"
+            2 -> "+$trimmed "
+            3 -> "+${trimmed.take(1)} (${trimmed.substring(1)}"
+            4 -> "+${trimmed.take(1)} (${trimmed.substring(1, 4)}"
+            5 -> "+${trimmed.take(1)} (${trimmed.substring(1, 4)}) ${trimmed[4]}"
+            6 -> "+${trimmed.take(1)} (${trimmed.substring(1, 4)}) ${trimmed.substring(4, 7)}"
+            7 -> "+${trimmed.take(1)} (${trimmed.substring(1, 4)}) ${trimmed.substring(4, 7)}-${trimmed[7]}"
+            8 -> "+${trimmed.take(1)} (${trimmed.substring(1, 4)}) ${trimmed.substring(4, 7)}-${trimmed.substring(7, 9)}"
+            9 -> "+${trimmed.take(1)} (${trimmed.substring(1, 4)}) ${trimmed.substring(4, 7)}-${trimmed.substring(7, 9)}-${trimmed[9]}"
+            10 -> "+${trimmed.take(1)} (${trimmed.substring(1, 4)}) ${trimmed.substring(4, 7)}-${trimmed.substring(7, 9)}-${trimmed.substring(9, 11)}"
+            11 -> "+${trimmed.take(1)} (${trimmed.substring(1, 4)}) ${trimmed.substring(4, 7)}-${trimmed.substring(7, 9)}-${trimmed.substring(9, 11)}"
+            else -> trimmed
         }
     }
 }
