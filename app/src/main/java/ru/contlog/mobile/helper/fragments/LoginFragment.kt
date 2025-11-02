@@ -71,6 +71,15 @@ class LoginFragment : Fragment() {
                 }
             }
         })
+
+        // Версия приложения
+        try {
+            val packageInfo = requireContext().packageManager.getPackageInfo(requireContext().packageName, 0)
+            val versionName = packageInfo.versionName
+            binding.appVersionText.text = "Версия: $versionName"
+        } catch (e: Exception) {
+            binding.appVersionText.text = "Версия: неизвестна"
+        }
     }
 
     private fun requestSmsCode(phoneNumber: String) {
@@ -82,8 +91,9 @@ class LoginFragment : Fragment() {
             launch(Dispatchers.Main) {
                 result.fold(
                     onSuccess = {
-                        val formattedPhone = formatPhoneNumber("7$phoneNumber")
+                        val formattedPhone = formatPhoneNumber("$phoneNumber")
                         binding.codeSentMessage.text = getString(R.string.smsSentTo, formattedPhone)
+                        binding.codeSentMessage.setTextColor(requireContext().getColor(android.R.color.holo_green_dark))
                         binding.codeSentMessage.visibility = View.VISIBLE
                         binding.codeInput.isEnabled = true
                         binding.codeInput.requestFocus()
@@ -140,24 +150,23 @@ class LoginFragment : Fragment() {
     }
 
     // ✅ ИСПРАВЛЕННАЯ МАСКА: +7 (XXX) XXX-XX-XX
-    private fun formatPhoneNumber(raw: String): String {
-        val digits = raw.replace(Regex("\\D"), "")
-        val trimmed = if (digits.length > 11) digits.substring(0, 11) else digits
+    private fun formatPhoneNumber(digits: String): String {
+        // Ожидаем максимум 10 цифр (без кода страны)
+        val clean = digits.take(10)
 
-        return when (trimmed.length) {
+        return when (clean.length) {
             0 -> ""
-            1 -> "+$trimmed"
-            2 -> "+$trimmed "
-            3 -> "+${trimmed.take(1)} (${trimmed.substring(1)}"
-            4 -> "+${trimmed.take(1)} (${trimmed.substring(1, 4)}"
-            5 -> "+${trimmed.take(1)} (${trimmed.substring(1, 4)}) ${trimmed[4]}"
-            6 -> "+${trimmed.take(1)} (${trimmed.substring(1, 4)}) ${trimmed.substring(4, 7)}"
-            7 -> "+${trimmed.take(1)} (${trimmed.substring(1, 4)}) ${trimmed.substring(4, 7)}-${trimmed[7]}"
-            8 -> "+${trimmed.take(1)} (${trimmed.substring(1, 4)}) ${trimmed.substring(4, 7)}-${trimmed.substring(7, 9)}"
-            9 -> "+${trimmed.take(1)} (${trimmed.substring(1, 4)}) ${trimmed.substring(4, 7)}-${trimmed.substring(7, 9)}-${trimmed[9]}"
-            10 -> "+${trimmed.take(1)} (${trimmed.substring(1, 4)}) ${trimmed.substring(4, 7)}-${trimmed.substring(7, 9)}-${trimmed.substring(9, 11)}"
-            11 -> "+${trimmed.take(1)} (${trimmed.substring(1, 4)}) ${trimmed.substring(4, 7)}-${trimmed.substring(7, 9)}-${trimmed.substring(9, 11)}"
-            else -> trimmed
+            1 -> "+7 ($clean"
+            2 -> "+7 ($clean"
+            3 -> "+7 ($clean"
+            4 -> "+7 (${clean.substring(0, 3)}) ${clean[3]}"
+            5 -> "+7 (${clean.substring(0, 3)}) ${clean.substring(3, 5)}"
+            6 -> "+7 (${clean.substring(0, 3)}) ${clean.substring(3, 6)}"
+            7 -> "+7 (${clean.substring(0, 3)}) ${clean.substring(3, 6)}-${clean[6]}"
+            8 -> "+7 (${clean.substring(0, 3)}) ${clean.substring(3, 6)}-${clean.substring(6, 8)}"
+            9 -> "+7 (${clean.substring(0, 3)}) ${clean.substring(3, 6)}-${clean.substring(6, 8)}-${clean[8]}"
+            10 -> "+7 (${clean.substring(0, 3)}) ${clean.substring(3, 6)}-${clean.substring(6, 8)}-${clean.substring(8, 10)}"
+            else -> "+7 (${clean.substring(0, 3)}) ${clean.substring(3, 6)}-${clean.substring(6, 8)}-${clean.substring(8, 10)}"
         }
     }
 }

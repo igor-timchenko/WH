@@ -10,6 +10,18 @@
     android:fitsSystemWindows="true"
     >
 
+    <TextView
+        android:id="@+id/appVersionText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:textColor="?android:attr/textColorSecondary"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:text="Версия: 0.0.0" />
+
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="0dp"
@@ -111,7 +123,7 @@
         android:layout_marginTop="8dp"
         android:text="@string/smsSentTo"
         android:textAlignment="center"
-        android:textColor="#48FF00"
+        android:textColor="#ff669900"
         android:textStyle="bold"
         android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="@+id/codeInputTIL"
