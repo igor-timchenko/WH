@@ -39,20 +39,22 @@
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="96dp"
+        android:layout_marginTop="102dp"
         android:text="@string/phone_number"
         android:textColor="@color/black"
         android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/phoneInputTIL"
         app:layout_constraintEnd_toEndOf="@+id/phoneInputTIL"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/phoneInputTIL"
-        app:layout_constraintTop_toBottomOf="@+id/imageView" />
+        app:layout_constraintTop_toBottomOf="@+id/imageView"
+        app:layout_constraintVertical_bias="1.0" />
 
     <TextView
-        android:id="@+id/textView3"
+        android:id="@+id/textCodeInput"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="64dp"
         android:text="@string/auth_code"
         android:textColor="@color/black"
         android:textStyle="bold"
@@ -83,9 +85,9 @@
             android:autofillHints=""
             android:ems="10"
             android:maxLength="10"
+            android:digits="0123456789() -"
             android:hint="@string/phoneHint"
-            android:inputType="number"
-            android:digits="0123456789"/>
+            android:inputType="number" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -96,7 +98,7 @@
         app:hintEnabled="false"
         app:layout_constraintEnd_toEndOf="@+id/phoneInputTIL"
         app:layout_constraintStart_toStartOf="@+id/phoneInputTIL"
-        app:layout_constraintTop_toBottomOf="@+id/textView3">
+        app:layout_constraintTop_toBottomOf="@+id/textCodeInput">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/codeInput"
@@ -122,6 +124,7 @@
         android:id="@+id/codeSentMessage"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
         android:text="@string/smsSentTo"
         android:textAlignment="center"
         android:textColor="#ff669900"
@@ -136,12 +139,13 @@
         android:id="@+id/codeSentMessage2"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
         android:text="@string/smsSentCode"
         android:textAlignment="center"
         android:textColor="#FF9D00"
         android:textStyle="bold"
         android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/textView3"
+        app:layout_constraintBottom_toTopOf="@+id/textCodeInput"
         app:layout_constraintEnd_toEndOf="@+id/codeInputTIL"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/codeInputTIL" />

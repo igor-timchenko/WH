@@ -33,6 +33,11 @@ class LoginFragment : Fragment() {
     }
 
     private fun bind() {
+        // Скрываем всё, что связано с кодом
+        binding.textCodeInput.visibility = View.GONE
+        binding.codeInput.visibility = View.GONE
+        binding.codeSentMessage2.visibility = View.GONE
+
         binding.codeInput.isEnabled = false
 
         // Слушатель номера телефона
@@ -86,35 +91,49 @@ class LoginFragment : Fragment() {
     }
 
     private fun requestSmsCode(phoneNumber: String) {
+        // Скрываем всё — НИЧЕГО не показываем заранее
         binding.codeSentMessage.visibility = View.INVISIBLE
-        binding.codeSentMessage2.visibility = View.INVISIBLE
 
         lifecycleScope.launch(Dispatchers.IO) {
             val result = Api.Auth.getSms("7$phoneNumber")
 
             launch(Dispatchers.Main) {
+                if (!isAdded) return@launch
+
                 result.fold(
                     onSuccess = {
                         val formattedPhone = formatPhoneNumber(phoneNumber)
                         binding.codeSentMessage.text = getString(R.string.smsSentTo, formattedPhone)
                         binding.codeSentMessage.setTextColor(requireContext().getColor(android.R.color.holo_green_dark))
                         binding.codeSentMessage.visibility = View.VISIBLE
-                        binding.codeSentMessage2.visibility = View.VISIBLE
+
+                        // ✅ Показываем ТОЛЬКО здесь
+                        binding.textCodeInput.visibility = View.VISIBLE
+                        binding.codeInput.visibility = View.VISIBLE
+                        binding.codeSentMessage2.visibility = View.GONE // скрыто сначала
 
                         binding.codeInput.isEnabled = true
                         binding.codeInput.setText("")
-                        binding.codeInput.requestFocus() // ✅ Только при успехе
+                        binding.codeInput.requestFocus()
+
+                        // Показываем подсказку через 1 сек, если поле пустое
+                        binding.codeInput.postDelayed({
+                            if (isAdded && binding.codeInput.text?.toString()?.trim().isNullOrBlank()) {
+                                binding.codeSentMessage2.visibility = View.VISIBLE
+                            }
+                        }, 1000)
                     },
                     onFailure = { _ ->
                         binding.codeSentMessage.text = "Номер телефона не зарегистрирован в компании. Обратитесь в отдел персонала. Или попробуйте ещё раз!"
                         binding.codeSentMessage.setTextColor(requireContext().getColor(android.R.color.holo_red_dark))
                         binding.codeSentMessage.visibility = View.VISIBLE
 
-                        // ❌ НЕ даём фокус и НЕ активируем ввод кода при ошибке номера
-                        binding.codeSentMessage2.visibility = View.INVISIBLE
-                        binding.codeInput.isEnabled = false // ← критически важно
+                        // При ошибке — скрываем всё, связанное с кодом
+                        binding.textCodeInput.visibility = View.GONE
+                        binding.codeInput.visibility = View.GONE
+                        binding.codeSentMessage2.visibility = View.GONE
+                        binding.codeInput.isEnabled = false
                         binding.codeInput.setText("")
-                        // НЕ вызываем requestFocus()
                     }
                 )
             }
@@ -156,7 +175,9 @@ class LoginFragment : Fragment() {
     private fun resetState() {
         smsRequested = false
         binding.codeSentMessage.visibility = View.INVISIBLE
-        binding.codeSentMessage2.visibility = View.INVISIBLE
+        binding.codeSentMessage2.visibility = View.GONE // ← GONE, а не INVISIBLE
+        binding.textCodeInput.visibility = View.GONE
+        binding.codeInput.visibility = View.GONE
         binding.codeInput.isEnabled = false
         binding.codeInput.setText("")
     }
