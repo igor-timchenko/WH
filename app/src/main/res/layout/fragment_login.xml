@@ -84,7 +84,8 @@
             android:ems="10"
             android:maxLength="10"
             android:hint="@string/phoneHint"
-            android:inputType="number" />
+            android:inputType="number"
+            android:digits="0123456789"/>
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -106,7 +107,8 @@
             android:ems="10"
             android:maxLength="4"
             android:hint="@string/codeHint"
-            android:inputType="number" />
+            android:inputType="number"
+            android:digits="0123456789"/>
     </com.google.android.material.textfield.TextInputLayout>
 
     <androidx.constraintlayout.widget.Guideline
@@ -120,15 +122,28 @@
         android:id="@+id/codeSentMessage"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
         android:text="@string/smsSentTo"
         android:textAlignment="center"
         android:textColor="#ff669900"
         android:textStyle="bold"
         android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/textView2"
         app:layout_constraintEnd_toEndOf="@+id/codeInputTIL"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="@+id/codeInputTIL"
-        app:layout_constraintTop_toBottomOf="@+id/codeInputTIL" />
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/codeInputTIL" />
+
+    <TextView
+        android:id="@+id/codeSentMessage2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/smsSentCode"
+        android:textAlignment="center"
+        android:textColor="#FF9D00"
+        android:textStyle="bold"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/textView3"
+        app:layout_constraintEnd_toEndOf="@+id/codeInputTIL"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/codeInputTIL" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

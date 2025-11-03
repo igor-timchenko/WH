@@ -10,7 +10,7 @@
     <string name="app_version">Версия: %s</string>
 
     <string name="smsSentTo">SMS-код отправлен на номер %1$s</string>
-    <string name="smsSentDo">Код неправильный, повторите</string>
+    <string name="smsSentCode">Код должен содержать 4 символа</string>
 
     <string name="errorSendingSMS">Ошибка отправки СМС</string>
     <string name="errorCheckingSMS">Ошибка проверки СМС</string>
