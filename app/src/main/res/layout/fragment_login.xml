@@ -84,7 +84,7 @@
             android:layout_height="wrap_content"
             android:autofillHints=""
             android:ems="10"
-            android:maxLength="10"
+            android:maxLength="16"
             android:digits="0123456789() -"
             android:hint="@string/phoneHint"
             android:inputType="number" />
