@@ -3,7 +3,6 @@ package ru.contlog.mobile.helper
 // Импорты системных и вспомогательных классов Android
 import android.os.Build                    // Для проверки версии Android API
 import android.os.Bundle                     // Для работы с состоянием активности
-import android.util.Log                      // Для логирования (в коде не используется напрямую, но импортирован)
 import android.view.View                     // Базовый класс UI-элемента
 import android.view.WindowInsets             // Для работы с системными вставками (status bar, navigation bar)
 // Включает edge-to-edge режим (полноэкранный интерфейс)
@@ -12,15 +11,10 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 // Базовый класс активности с поддержкой Material Design
 import androidx.appcompat.app.AppCompatActivity
-// Расширения для работы с совместимостью View
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 // Область корутин, привязанная к жизненному циклу активности
 import androidx.lifecycle.lifecycleScope
 // Утилиты для навигации между фрагментами
-import androidx.navigation.Navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.fragment.findNavController
 // Корутины
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
