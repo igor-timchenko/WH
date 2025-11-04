@@ -58,14 +58,14 @@ class LoginFragment : Fragment() {
     @SuppressLint("SetTextI18n")
     private fun bind() {
         // Изначально скрываем все элементы, связанные с вводом кода
-        binding.textCodeInput.visibility = View.GONE
-        binding.codeInput.visibility = View.GONE
-        binding.codeSentMessage2.visibility = View.GONE
+        binding.TextCodeInput.visibility = View.GONE
+        binding.CodeInput.visibility = View.GONE
+        binding.CodeSentMessage.visibility = View.GONE
         // Деактивируем поле ввода кода (нельзя ввести код до получения SMS)
-        binding.codeInput.isEnabled = false
+        binding.CodeInput.isEnabled = false
 
         // === Слушатель ввода номера телефона с автоматическим форматированием по маске (913) 440-89-04 ===
-        binding.phoneInput.addTextChangedListener(object : android.text.TextWatcher {
+        binding.PhoneInput.addTextChangedListener(object : android.text.TextWatcher {
             // Флаг для предотвращения зацикливания при программном изменении текста
             private var isFormatting = false
 
@@ -89,13 +89,13 @@ class LoginFragment : Fragment() {
                 isFormatting = true
                 s.replace(0, s.length, formatted)
                 // Устанавливаем курсор в конец текста
-                binding.phoneInput.setSelection(formatted.length)
+                binding.PhoneInput.setSelection(formatted.length)
                 isFormatting = false
 
                 // Проверяем, является ли номер валидным (ровно 10 цифр)
                 val isPhoneValid = clean.length == 10
                 // Активируем поле ввода кода только при валидном номере
-                binding.codeInput.isEnabled = isPhoneValid
+                binding.CodeInput.isEnabled = isPhoneValid
 
                 // Если номер валиден и SMS ещё не запрашивался — отправляем запрос
                 if (isPhoneValid && !smsRequested) {
@@ -111,7 +111,7 @@ class LoginFragment : Fragment() {
         })
 
         // === Слушатель ввода кода подтверждения ===
-        binding.codeInput.addTextChangedListener(object : android.text.TextWatcher {
+        binding.CodeInput.addTextChangedListener(object : android.text.TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
             override fun afterTextChanged(s: Editable?) {
@@ -125,11 +125,11 @@ class LoginFragment : Fragment() {
                 // Если введено ровно 4 цифры — запускаем проверку кода
                 if (code.length == 4 && code.all { it.isDigit() }) {
                     // Скрываем подсказку "Код должен содержать 4 символа"
-                    binding.codeSentMessage2.visibility = View.INVISIBLE
+                    binding.CodeSentMessage.visibility = View.INVISIBLE
                     verifyCode(code)
                 } else if (code.isNotEmpty()) {
                     // Если введено 1–3 символа — показываем подсказку
-                    binding.codeSentMessage2.visibility = View.VISIBLE
+                    binding.CodeSentMessage.visibility = View.VISIBLE
                 }
             }
         })
@@ -149,7 +149,7 @@ class LoginFragment : Fragment() {
     // Метод отправки запроса на SMS с кодом подтверждения
     private fun requestSmsCode(phoneNumber: String) {
         // Скрываем предыдущее сообщение об отправке/ошибке
-        binding.codeSentMessage.visibility = View.INVISIBLE
+        binding.PhoneSentMessage.visibility = View.INVISIBLE
 
         // Запускаем сетевой запрос в фоновом потоке
         lifecycleScope.launch(Dispatchers.IO) {
@@ -165,48 +165,48 @@ class LoginFragment : Fragment() {
                         // Форматируем номер для отображения (без +7)
                         val formattedPhone = formatPhoneNumber(phoneNumber)
                         // Устанавливаем текст сообщения "Код отправлен на ..."
-                        binding.codeSentMessage.text = getString(R.string.smsSentTo, formattedPhone)
+                        binding.PhoneSentMessage.text = getString(R.string.smsSentTo, formattedPhone)
                         // Задаём зелёный цвет (успех)
-                        binding.codeSentMessage.setTextColor(
+                        binding.PhoneSentMessage.setTextColor(
                             ContextCompat.getColor(requireContext(), android.R.color.holo_green_dark)
                         )
-                        binding.codeSentMessage.visibility = View.VISIBLE
+                        binding.PhoneSentMessage.visibility = View.VISIBLE
 
                         // Показываем элементы, связанные с вводом кода
-                        binding.textCodeInput.visibility = View.VISIBLE
-                        binding.codeInput.visibility = View.VISIBLE
-                        binding.codeSentMessage2.visibility = View.GONE // Подсказка скрыта изначально
+                        binding.TextCodeInput.visibility = View.VISIBLE
+                        binding.CodeInput.visibility = View.VISIBLE
+                        binding.CodeSentMessage.visibility = View.GONE // Подсказка скрыта изначально
 
                         // Активируем поле, очищаем его и устанавливаем фокус
-                        binding.codeInput.isEnabled = true
-                        binding.codeInput.setText("")
-                        binding.codeInput.requestFocus()
+                        binding.CodeInput.isEnabled = true
+                        binding.CodeInput.setText("")
+                        binding.CodeInput.requestFocus()
 
                         // Показываем подсказку "Код должен содержать 4 символа" через 1 секунду,
                         // но только если поле осталось пустым
-                        binding.codeInput.postDelayed({
+                        binding.CodeInput.postDelayed({
                             if (isAdded && _binding != null) {
-                                val currentCode = binding.codeInput.text?.toString()?.trim()
+                                val currentCode = binding.CodeInput.text?.toString()?.trim()
                                 if (currentCode.isNullOrEmpty()) {
-                                    binding.codeSentMessage2.visibility = View.VISIBLE
+                                    binding.CodeSentMessage.visibility = View.VISIBLE
                                 }
                             }
                         }, 1000)
                     },
                     onFailure = { _ ->
-                        // При ошибке (номер не зарегистрирован) показываем красное сообщение
-                        binding.codeSentMessage.text = "Номер телефона не зарегистрирован в компании. Обратитесь в отдел персонала. Или попробуйте ещё раз!"
-                        binding.codeSentMessage.setTextColor(
+                        val formattedPhone = formatPhoneNumber(phoneNumber)
+                        binding.PhoneSentMessage.text = getString(R.string.error_user_not_found, formattedPhone)
+                        binding.PhoneSentMessage.setTextColor(
                             ContextCompat.getColor(requireContext(), android.R.color.holo_red_dark)
                         )
-                        binding.codeSentMessage.visibility = View.VISIBLE
+                        binding.PhoneSentMessage.visibility = View.VISIBLE
 
                         // Скрываем всё, что связано с вводом кода
-                        binding.textCodeInput.visibility = View.GONE
-                        binding.codeInput.visibility = View.GONE
-                        binding.codeSentMessage2.visibility = View.GONE
-                        binding.codeInput.isEnabled = false
-                        binding.codeInput.setText("")
+                        binding.TextCodeInput.visibility = View.GONE
+                        binding.CodeInput.visibility = View.GONE
+                        binding.CodeSentMessage.visibility = View.GONE
+                        binding.CodeInput.isEnabled = false
+                        binding.CodeInput.setText("")
                     }
                 )
             }
@@ -216,7 +216,7 @@ class LoginFragment : Fragment() {
     // Метод проверки введённого кода подтверждения
     private fun verifyCode(code: String) {
         // Получаем сырой ввод из поля телефона и оставляем только цифры
-        val rawInput = binding.phoneInput.text?.toString() ?: ""
+        val rawInput = binding.PhoneInput.text?.toString() ?: ""
         val phoneNumber = rawInput.replace(Regex("\\D"), "") // только цифры
         // Дополнительная проверка длины и содержимого (защита от гонок)
         if (phoneNumber.length != 10 || !phoneNumber.all { it.isDigit() }) return
@@ -235,20 +235,20 @@ class LoginFragment : Fragment() {
                         viewModel.login = phoneNumber
                         viewModel.apiAuthData = apiAuthData
                         // Скрываем все сообщения
-                        binding.codeSentMessage.visibility = View.INVISIBLE
-                        binding.codeSentMessage2.visibility = View.INVISIBLE
+                        binding.PhoneSentMessage.visibility = View.INVISIBLE
+                        binding.CodeSentMessage.visibility = View.INVISIBLE
                         // Переход к следующему экрану
                         findNavController().navigate(R.id.action_loginFragment_to_workSitesFragment)
                     },
                     onFailure = { _ ->
                         // При неверном коде очищаем поле и показываем диалог
-                        binding.codeInput.setText("")
-                        binding.codeSentMessage2.visibility = View.VISIBLE
+                        binding.CodeInput.setText("")
+                        binding.CodeSentMessage.visibility = View.VISIBLE
                         MaterialAlertDialogBuilder(requireContext())
                             .setTitle("Неверный код")
                             .setMessage("Код неправильный, повторите")
                             .setPositiveButton("OK") { _, _ ->
-                                binding.codeInput.requestFocus()
+                                binding.CodeInput.requestFocus()
                             }
                             .show()
                     }
@@ -260,12 +260,12 @@ class LoginFragment : Fragment() {
     // Метод сброса состояния (при удалении цифр из номера)
     private fun resetState() {
         smsRequested = false
-        binding.codeSentMessage.visibility = View.INVISIBLE
-        binding.codeSentMessage2.visibility = View.GONE
-        binding.textCodeInput.visibility = View.GONE
-        binding.codeInput.visibility = View.GONE
-        binding.codeInput.isEnabled = false
-        binding.codeInput.setText("")
+        binding.PhoneSentMessage.visibility = View.INVISIBLE
+        binding.CodeSentMessage.visibility = View.GONE
+        binding.TextCodeInput.visibility = View.GONE
+        binding.CodeInput.visibility = View.GONE
+        binding.CodeInput.isEnabled = false
+        binding.CodeInput.setText("")
     }
 
     // Форматирование номера по маске: " (XXX) XXX-XX-XX"

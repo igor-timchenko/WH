@@ -9,7 +9,9 @@
     <string name="company_logo_cd">Логотип компании</string>
     <string name="app_version">Версия: %s</string>
 
-    <string name="smsSentTo">SMS-код отправлен на номер +7%1$s</string>
+    <string name="error_user_not_found">Пользователь с номером телефона +7\%1$s\ не зарегистрирован в компании. Обратитесь в отдел персонала. Или исправьте номер телефона!</string>
+
+    <string name="smsSentTo">СМС код отправлен на номер телефона +7%1$s</string>
     <string name="smsSentCode">Код должен содержать 4 символа</string>
 
     <string name="errorSendingSMS">Ошибка отправки СМС</string>
