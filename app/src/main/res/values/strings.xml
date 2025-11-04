@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Поставщик КОНТИНЕНТ</string>
-    <string name="phoneHint">(983) 255-25-25</string>
+    <string name="phoneHint">\u00A0(983)\u00A0255-25-25</string>
     <string name="codeHint">0000</string>
     <string name="buttonGetCode">Код</string>
     <string name="buttonCheckCode">Войти</string>
@@ -9,7 +9,7 @@
     <string name="company_logo_cd">Логотип компании</string>
     <string name="app_version">Версия: %s</string>
 
-    <string name="smsSentTo">SMS-код отправлен на номер %1$s</string>
+    <string name="smsSentTo">SMS-код отправлен на номер +7%1$s</string>
     <string name="smsSentCode">Код должен содержать 4 символа</string>
 
     <string name="errorSendingSMS">Ошибка отправки СМС</string>
