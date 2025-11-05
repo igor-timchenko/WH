@@ -40,7 +40,8 @@ object Api {
                     .build()
 
                 val request = Request.Builder()
-                    .url("$API_ENDPOINT/auth/get_sms/wh")
+                    .url("$API_ENDPOINT/auth/v2/get_sms")
+                    .addHeader("Application-Name", "WHAndroid-MobileCabinet")
                     .post(body)
                     .build()
 
@@ -88,7 +89,8 @@ object Api {
                     .build()
 
                 val request = Request.Builder()
-                    .url("$API_ENDPOINT/auth/check_sms/wh")
+                    .url("$API_ENDPOINT/auth/v2/check_sms")
+                    .addHeader("Application-Name", "WHAndroid-MobileCabinet")
                     .post(body)
                     .build()
 

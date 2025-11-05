@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Поставщик КОНТИНЕНТ</string>
     <string name="phoneHint">\u00A0(983)\u00A0255-25-25</string>
-    <string name="codeHint">0000</string>
+    <string name="codeHint">00000</string>
     <string name="buttonGetCode">Код</string>
     <string name="buttonCheckCode">Войти</string>
     <string name="auth_code">Код подтверждения</string>
@@ -12,7 +12,7 @@
     <string name="error_user_not_found">Пользователь с номером телефона +7\%1$s\ не зарегистрирован в компании. Обратитесь в отдел персонала. Или исправьте номер телефона!</string>
 
     <string name="smsSentTo">СМС код отправлен на номер телефона +7%1$s</string>
-    <string name="smsSentCode">Код должен содержать 4 символа</string>
+    <string name="smsSentCode">Код должен содержать 5 цифр</string>
 
     <string name="errorSendingSMS">Ошибка отправки СМС</string>
     <string name="errorCheckingSMS">Ошибка проверки СМС</string>

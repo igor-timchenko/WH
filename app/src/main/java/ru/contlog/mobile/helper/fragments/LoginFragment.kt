@@ -93,11 +93,11 @@ class LoginFragment : Fragment() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
             override fun afterTextChanged(s: Editable?) {
                 val code = s?.toString()?.trim() ?: ""
-                if (code.length > 4) {
-                    s?.delete(4, code.length)
+                if (code.length > 5) {
+                    s?.delete(5, code.length)
                     return
                 }
-                if (code.length == 4 && code.all { it.isDigit() }) {
+                if (code.length == 5 && code.all { it.isDigit() }) {
                     binding.CodeSentMessage.visibility = View.INVISIBLE
                     verifyCode(code)
                 } else if (code.isNotEmpty()) {
