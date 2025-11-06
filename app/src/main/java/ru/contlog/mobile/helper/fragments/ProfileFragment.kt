@@ -50,20 +50,14 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Подписываемся на ошибки — ОТДЕЛЬНО от userData
+        // Подписка на ошибки — показываем только ошибку, скрываем профиль
         viewModel.errors.observe(viewLifecycleOwner) { errors ->
             if (errors.isNotEmpty()) {
-                // Форматируем ошибки
-                val errorMessage = errors.mapIndexed { i, e ->
-                    "${i + 1}. ${e.message ?: e}"
-                }.joinToString("\n")
-                binding.errorsText.text = errorMessage
+                binding.errorsText.text = "Ошибка соединения, проверьте подключение"
                 binding.errorsCard.visibility = View.VISIBLE
-                // 🔴 Скрываем профиль, даже если данные есть
                 binding.userInfoCard.visibility = View.GONE
             } else {
                 binding.errorsCard.visibility = View.GONE
-                // Не показываем профиль здесь — это делает подписка на userData
             }
         }
 

@@ -97,7 +97,7 @@ class ProductInfoFragment : Fragment() {
         // 🔹 ОБНОВЛЁННЫЙ ОБРАБОТЧИК: проверка интернета перед сканированием
         binding.scan.setOnClickListener {
             if (!isOnline()) {
-                Toast.makeText(requireContext(), "Включите интернет", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Ошибка соединения, проверьте подключение!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
             doScan()
