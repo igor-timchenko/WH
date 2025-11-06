@@ -152,6 +152,7 @@ class LoginFragment : Fragment() {
     }
 
     // Метод отправки запроса на SMS с кодом подтверждения
+    @SuppressLint("InlinedApi")
     private fun requestSmsCode(phoneNumber: String) {
         // Скрываем предыдущее сообщение об отправке/ошибке
         binding.PhoneSentMessage.visibility = View.INVISIBLE
@@ -265,6 +266,8 @@ class LoginFragment : Fragment() {
                         binding.CodeSentMessage.visibility = View.INVISIBLE
                         // Переход к следующему экрану
                         findNavController().navigate(R.id.action_loginFragment_to_workSitesFragment)
+                        // Показ Toast-уведомления об успешной авторизации (выполняется после корутины)
+                        Toast.makeText(requireContext(), "Авторизация успешна!!!", Toast.LENGTH_SHORT).show()
                     },
                     onFailure = { _ ->
                         // При неверном коде очищаем поле и показываем диалог
@@ -281,8 +284,6 @@ class LoginFragment : Fragment() {
                 )
             }
         }
-        // Показ Toast-уведомления об успешной авторизации (выполняется после корутины)
-        Toast.makeText(requireContext(), "Авторизация успешна!!!", Toast.LENGTH_SHORT).show()
     }
 
     // Метод сброса состояния (при удалении цифр из номера)

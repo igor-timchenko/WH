@@ -50,42 +50,54 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Подписываемся на изменения данных пользователя из ViewModel
-        viewModel.userData.observe(viewLifecycleOwner) { userData ->
-            // Если данных ещё нет (null) — скрываем карточку профиля
-            if (userData == null) {
+        // Подписываемся на ошибки — ОТДЕЛЬНО от userData
+        viewModel.errors.observe(viewLifecycleOwner) { errors ->
+            if (errors.isNotEmpty()) {
+                // Форматируем ошибки
+                val errorMessage = errors.mapIndexed { i, e ->
+                    "${i + 1}. ${e.message ?: e}"
+                }.joinToString("\n")
+                binding.errorsText.text = errorMessage
+                binding.errorsCard.visibility = View.VISIBLE
+                // 🔴 Скрываем профиль, даже если данные есть
                 binding.userInfoCard.visibility = View.GONE
+            } else {
+                binding.errorsCard.visibility = View.GONE
+                // Не показываем профиль здесь — это делает подписка на userData
+            }
+        }
+
+        // Подписываемся на данные пользователя
+        viewModel.userData.observe(viewLifecycleOwner) { userData ->
+            // Если есть ошибки — не показываем профиль (уже скрыт выше)
+            if (viewModel.errors.value?.isNotEmpty() == true) {
                 return@observe
             }
 
-            // Устанавливаем ФИО и должность из полученных данных
-            binding.fullName.text = userData.name
-            binding.position.text = userData.position
+            if (userData == null) {
+                binding.userInfoCard.visibility = View.GONE
+            } else {
+                binding.fullName.text = userData.name
+                binding.position.text = userData.position
 
-            // Декодируем фото пользователя из Base64 в фоновом потоке (используем Dispatchers.Default для CPU-интенсивных задач)
-            lifecycleScope.launch(Dispatchers.Default) {
-                val bytes = Base64.decode(userData.photo, Base64.DEFAULT)
-                val decodedBitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
-                // Устанавливаем изображение в ImageView на главном потоке
-                launch(Dispatchers.Main) {
-                    binding.userAvatar.setImageBitmap(decodedBitmap)
+                lifecycleScope.launch(Dispatchers.Default) {
+                    val bytes = Base64.decode(userData.photo, Base64.DEFAULT)
+                    val decodedBitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+                    launch(Dispatchers.Main) {
+                        binding.userAvatar.setImageBitmap(decodedBitmap)
+                    }
                 }
+                binding.userInfoCard.visibility = View.VISIBLE
             }
-
-            // Показываем карточку профиля
-            binding.userInfoCard.visibility = View.VISIBLE
         }
 
-        // Обработчик свайпа для обновления данных (pull-to-refresh)
+        // Обработчики
         binding.refresh.setOnRefreshListener {
-            getData() // Загружаем данные заново
+            getData()
         }
 
-        // Обработчик нажатия на кнопку "Выйти"
         binding.logout.setOnClickListener {
-            // Переход на экран авторизации
             findNavController().navigate(R.id.action_profileFragment_to_loginFragment)
-            // Очистка данных авторизации в ViewModel
             viewModel.logout()
         }
     }

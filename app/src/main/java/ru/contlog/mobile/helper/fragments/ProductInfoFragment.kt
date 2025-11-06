@@ -1,12 +1,16 @@
 package ru.contlog.mobile.helper.fragments
 
 // Импорты системных и сторонних библиотек
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.Build                   // Для проверки версии Android API
 import android.os.Bundle                    // Для передачи данных между компонентами
 import android.util.Log                     // Для логирования отладочной информации
 import android.view.LayoutInflater          // Для создания UI из XML-разметки
 import android.view.View                    // Базовый класс представления
 import android.view.ViewGroup               // Контейнер для View
+import android.widget.Toast
 import androidx.activity.result.ActivityResultCallback // Обратный вызов результата активности
 import androidx.fragment.app.Fragment       // Базовый класс фрагмента
 import androidx.fragment.app.viewModels     // Делегат для получения ViewModel, привязанной к фрагменту
@@ -90,8 +94,14 @@ class ProductInfoFragment : Fragment() {
             findNavController().navigate(R.id.action_productInfoFragment_to_workSitesFragment)
         }
 
-        // Привязываем обработчик к кнопке сканирования
-        binding.scan.setOnClickListener { doScan() }
+        // 🔹 ОБНОВЛЁННЫЙ ОБРАБОТЧИК: проверка интернета перед сканированием
+        binding.scan.setOnClickListener {
+            if (!isOnline()) {
+                Toast.makeText(requireContext(), "Включите интернет", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            doScan()
+        }
 
         // Устанавливаем кастомный LayoutManager, который позволяет блокировать прокрутку
         binding.productsList.layoutManager = CustomLinearLayoutManager(
@@ -187,5 +197,19 @@ class ProductInfoFragment : Fragment() {
             data.add(p)
         }
         return data
+    }
+
+    // 🔹 МЕТОД ПРОВЕРКИ ДОСТУПА В ИНТЕРНЕТ
+    private fun isOnline(): Boolean {
+        val connectivityManager = requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val network = connectivityManager.activeNetwork ?: return false
+            val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
+            capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
+                    capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)
+        } else {
+            @Suppress("DEPRECATION")
+            connectivityManager.activeNetworkInfo?.isConnected == true
+        }
     }
 }
