@@ -12,6 +12,8 @@ class ApiRequestException(
     // Конструктор также принимает текстовое сообщение об ошибке.
     // Может содержать детали от сервера (например, "401 Unauthorized") или описание клиентской ошибки.
     val exceptionMessage: String,
+
+    val humanMessage: String,
 ) : Exception() {  // Вызов конструктора родительского класса Exception без параметров.
 
     // Переопределение свойства message из родительского класса Exception.

@@ -13,6 +13,7 @@ import androidx.core.content.edit
 import kotlinx.serialization.json.Json
 // Модель данных авторизации, которую нужно сохранять/загружать.
 import ru.contlog.mobile.helper.model.ApiAuthData
+import ru.contlog.mobile.helper.model.Division
 
 // Класс для работы с локальным хранилищем (SharedPreferences) приложения.
 // Инкапсулирует операции сохранения и чтения настроек, включая сложные объекты (например, ApiAuthData).
@@ -83,7 +84,34 @@ class AppPreferencesRepository(private val context: Context) {
         return null
     }
 
-    // Вложенный companion object — содержит статические члены класса.
+    fun saveDivisionsList(key: String, value: List<Division>?) {
+        if (value == null) {
+            sharedPreferences.edit {
+                remove(key)
+            }
+            return
+        }
+
+        val strValue = jsonCoder.encodeToString<List<Division>>(value)
+        saveString(key, strValue)
+    }
+
+    fun getDivisionsList(key: String): List<Division>? {
+        val strValue = getString(key, "")
+        if (strValue.isEmpty()) {
+            return null
+        }
+
+        try {
+            val value = jsonCoder.decodeFromString<List<Division>>(strValue)
+            return value
+        } catch (e: Exception) {
+            Log.e(TAG, "getDivisionsList: error decoding divisions list", e)
+        }
+
+        return null
+    }
+
     companion object {
         // Тег для логирования.
         const val TAG = "AppPreferencesRepository"

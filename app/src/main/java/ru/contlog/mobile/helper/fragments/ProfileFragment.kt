@@ -94,6 +94,12 @@ class ProfileFragment : Fragment() {
             findNavController().navigate(R.id.action_profileFragment_to_loginFragment)
             viewModel.logout()
         }
+
+        viewModel.internetAvailable.observe(viewLifecycleOwner) { internetAvailable ->
+            if (internetAvailable) {
+                getData()
+            }
+        }
     }
 
     // Метод для загрузки данных пользователя и подразделений
@@ -106,15 +112,8 @@ class ProfileFragment : Fragment() {
             launch(Dispatchers.Main) {
                 binding.refresh.isRefreshing = true
             }
-            // Выполняем две задачи параллельно: загрузка данных пользователя и списка подразделений
-            awaitAll(
-                async {
-                    viewModel.fetchUserData()
-                },
-                async {
-                    viewModel.fetchDivisions()
-                }
-            )
+            // Выполняем загрузку данных пользователя, чтобы иметь свежие данные
+            viewModel.fetchUserData()
             // Скрываем индикатор обновления на главном потоке
             launch(Dispatchers.Main) {
                 binding.refresh.isRefreshing = false

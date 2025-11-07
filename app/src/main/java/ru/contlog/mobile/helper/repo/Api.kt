@@ -28,6 +28,23 @@ object Api {
         ignoreUnknownKeys = true
     }
 
+    object Service {
+        suspend fun serviceAvailable() : Boolean {
+            return try {
+                val request = Request.Builder()
+                    .url(API_ENDPOINT)
+                    .build()
+
+                val call = client.newCall(request)
+                call.await()
+
+                true
+            } catch (e: Exception) {
+                false
+            }
+        }
+    }
+
     object Auth {
         suspend fun getSms(
             phoneNumber: String
@@ -56,7 +73,8 @@ object Api {
                     if (data.error) {
                         return Result.failure(ApiRequestException(
                             "getSms",
-                            "Запрос вернул ошибку: ${response.message}"
+                            "Запрос вернул ошибку: ${response.message}",
+                            "Не удалось отправить СМС: произошла ошибка при чтении ответа от сервера"
                         ))
                     }
 
@@ -65,14 +83,16 @@ object Api {
 
                 return Result.failure(ApiRequestException(
                     "getSms",
-                    "Запрос вернул ошибку: ${response.message}"
+                    "Запрос вернул ошибку: ${response.message}",
+                    "Не удалось отправить СМС: произошла ошибка при чтении ответа от сервера"
                 ))
             } catch (e: Exception) {
                 Log.e(TAG, "getSms: Error sending request", e)
 
                 return Result.failure(ApiRequestException(
                     "getSms",
-                    "Ошибка во время выполнения запроса: ${e.message ?: "неизвестная ошибка"}"
+                    "Ошибка во время выполнения запроса: ${e.message ?: "неизвестная ошибка"}",
+                    "Не удалось отправить СМС"
                 ))
             }
         }
@@ -104,14 +124,16 @@ object Api {
                     if (data.error) {
                         return Result.failure(ApiRequestException(
                             "checkSms",
-                            "Запрос вернул ошибку: ${response.message}"
+                            "Запрос вернул ошибку: ${response.message}",
+                            "Не удалось проверить код: произошла ошибка при чтении ответа от сервера"
                         ))
                     }
 
                     if (data.data == null) {
                         return Result.failure(ApiRequestException(
                             "checkSms",
-                            "Сервер вернул пустой ответ: ${response.message}"
+                            "Сервер вернул пустой ответ: ${response.message}",
+                            "Не удалось проверить код: произошла ошибка при чтении ответа от сервера"
                         ))
                     }
 
@@ -120,14 +142,16 @@ object Api {
 
                 return Result.failure(ApiRequestException(
                     "checkSms",
-                    "Запрос вернул ошибку: ${response.message}"
+                    "Запрос вернул ошибку: ${response.message}",
+                    "Не удалось проверить код: произошла ошибка при чтении ответа от сервера"
                 ))
             } catch (e: Exception) {
                 Log.e(TAG, "checkSms: Error sending request", e)
 
                 return Result.failure(ApiRequestException(
                     "checkSms",
-                    "Ошибка во время выполнения запроса: ${e.message ?: "неизвестная ошибка"}"
+                    "Ошибка во время выполнения запроса: ${e.message ?: "неизвестная ошибка"}",
+                    "Не удалось проверить код"
                 ))
             }
         }
@@ -153,14 +177,16 @@ object Api {
                     if (data.error) {
                         return Result.failure(ApiRequestException(
                             "getUserData",
-                            "Запрос вернул ошибку: ${response.message}"
+                            "Запрос вернул ошибку: ${response.message}",
+                            "Не удалось получить данные пользователя: произошла ошибка при чтении ответа от сервера"
                         ))
                     }
 
                     if (data.data == null) {
                         return Result.failure(ApiRequestException(
                             "getUserData",
-                            "Сервер вернул пустой ответ: ${response.message}"
+                            "Сервер вернул пустой ответ: ${response.message}",
+                            "Не удалось получить данные пользователя: произошла ошибка при чтении ответа от сервера"
                         ))
                     }
 
@@ -169,14 +195,16 @@ object Api {
 
                 return Result.failure(ApiRequestException(
                     "getUserData",
-                    "Запрос вернул ошибку: ${response.message}"
+                    "Запрос вернул ошибку: ${response.message}",
+                    "Не удалось получить данные пользователя: произошла ошибка при чтении ответа от сервера"
                 ))
             } catch (e: Exception) {
                 Log.e(TAG, "checkSms: Error sending request", e)
 
                 return Result.failure(ApiRequestException(
                     "getUserData",
-                    "Ошибка во время выполнения запроса: ${e.message ?: "неизвестная ошибка"}"
+                    "Ошибка во время выполнения запроса: ${e.message ?: "неизвестная ошибка"}",
+                    "Не удалось получить данные пользователя"
                 ))
             }
         }
@@ -202,14 +230,16 @@ object Api {
                     if (data.error) {
                         return Result.failure(ApiRequestException(
                             "getDivisions",
-                            "Запрос вернул ошибку: ${response.message}"
+                            "Запрос вернул ошибку: ${response.message}",
+                            "Не удалось получить список площадок: произошла ошибка при чтении ответа от сервера"
                         ))
                     }
 
                     if (data.data == null) {
                         return Result.failure(ApiRequestException(
                             "getDivisions",
-                            "Сервер вернул пустой ответ: ${response.message}"
+                            "Сервер вернул пустой ответ: ${response.message}",
+                            "Не удалось получить список площадок: произошла ошибка при чтении ответа от сервера"
                         ))
                     }
 
@@ -218,14 +248,16 @@ object Api {
 
                 return Result.failure(ApiRequestException(
                     "getDivisions",
-                    "Запрос вернул ошибку: ${response.message}"
+                    "Запрос вернул ошибку: ${response.message}",
+                    "Не удалось получить список площадок: произошла ошибка при чтении ответа от сервера"
                 ))
             } catch (e: Exception) {
                 Log.e(TAG, "checkSms: Error sending request", e)
 
                 return Result.failure(ApiRequestException(
                     "getDivisions",
-                    "Ошибка во время выполнения запроса: ${e.message ?: "неизвестная ошибка"}"
+                    "Ошибка во время выполнения запроса: ${e.message ?: "неизвестная ошибка"}",
+                    "Не удалось получить список площадок"
                 ))
             }
         }
@@ -258,14 +290,16 @@ object Api {
                         if (data.error) {
                             return Result.failure(ApiRequestException(
                                 "getDivisions",
-                                "Запрос вернул ошибку: ${response.message}"
+                                "Запрос вернул ошибку: ${response.message}",
+                                "Не удалось получить информацию о продукте: произошла ошибка при чтении ответа от сервера"
                             ))
                         }
 
                         if (data.data == null) {
                             return Result.failure(ApiRequestException(
                                 "getDivisions",
-                                "Сервер вернул пустой ответ: ${response.message}"
+                                "Сервер вернул пустой ответ: ${response.message}",
+                                "Не удалось получить информацию о продукте: произошла ошибка при чтении ответа от сервера"
                             ))
                         }
 
@@ -274,14 +308,16 @@ object Api {
 
                     return Result.failure(ApiRequestException(
                         "getDivisions",
-                        "Запрос вернул ошибку: ${response.message}"
+                        "Запрос вернул ошибку: ${response.message}",
+                        "Не удалось получить информацию о продукте: произошла ошибка при чтении ответа от сервера"
                     ))
                 } catch (e: Exception) {
                     Log.e(TAG, "checkSms: Error sending request", e)
 
                     return Result.failure(ApiRequestException(
                         "getDivisions",
-                        "Ошибка во время выполнения запроса: ${e.message ?: "неизвестная ошибка"}"
+                        "Ошибка во время выполнения запроса: ${e.message ?: "неизвестная ошибка"}",
+                        "Не удалось получить информацию о продукте"
                     ))
                 }
             }

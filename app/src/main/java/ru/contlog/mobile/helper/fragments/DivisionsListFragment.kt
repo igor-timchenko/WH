@@ -21,6 +21,7 @@ import kotlinx.coroutines.awaitAll      // Ожидание завершения
 import kotlinx.coroutines.launch        // Запуск корутины
 import ru.contlog.mobile.helper.R       // Ресурсы приложения
 import ru.contlog.mobile.helper.databinding.FragmentDivisionsListBinding // ViewBinding для этого фрагмента
+import ru.contlog.mobile.helper.exceptions.ApiRequestException
 import ru.contlog.mobile.helper.repo.AppPreferencesRepository // Репозиторий настроек (здесь не используется напрямую)
 import ru.contlog.mobile.helper.rvadapters.DivisionsRVAdapter // Адаптер для RecyclerView
 import ru.contlog.mobile.helper.vm.AppViewModel // Общий ViewModel
@@ -60,9 +61,17 @@ class DivisionsListFragment : Fragment() {
                 return@observe
             }
 
+            val errorMessagesSet = errors.map { e ->
+                if (e is ApiRequestException) {
+                    e.humanMessage
+                } else {
+                    "Общая ошибка: ${e.javaClass.name}"
+                }
+            }.toSet()
+
             // Форматируем список ошибок в читаемый вид (с нумерацией)
-            val errorMessage = errors.mapIndexed { i, e ->
-                "${i+1}. ${e.message ?: e}"
+            val errorMessage = errorMessagesSet.mapIndexed { i, e ->
+                "${i+1}. $e"
             }.joinToString("\n")
             // Отображаем ошибки
             binding.errorsText.text = errorMessage
@@ -74,6 +83,7 @@ class DivisionsListFragment : Fragment() {
         }
 
         // Подписка на ошибки — показываем только ошибку, скрываем профиль
+        // ВОПРОС: а нужен ли этот код, когда есть код сверху?
         viewModel.errors.observe(viewLifecycleOwner) { errors ->
             if (errors.isNotEmpty()) {
                 binding.errorsText.text = "Ошибка соединения, проверьте подключение"
@@ -121,17 +131,27 @@ class DivisionsListFragment : Fragment() {
 
         // Обработчик обновления (свайп вниз)
         binding.refresh.setOnRefreshListener {
-            getData() // Загружаем данные заново
+            getData(loadDivisions=true) // Загружаем данные заново
+        }
+
+        binding.retryButton.setOnClickListener {
+            getData(loadDivisions = true)
+        }
+
+        viewModel.internetAvailable.observe(viewLifecycleOwner) { internetAvailable ->
+            if (internetAvailable && (viewModel.errors.value?.isNotEmpty() ?: false)) {
+                getData(loadDivisions = true)
+            }
         }
 
         // Запускаем загрузку данных после полной инициализации UI
         binding.root.post {
-            getData()
+            getData((viewModel.division.value?.isEmpty() ?: true))
         }
     }
 
     // Метод для загрузки данных с сервера
-    private fun getData() {
+    private fun getData(loadDivisions: Boolean) {
         // Очищаем предыдущие ошибки
         viewModel.clearErrors()
         // Запускаем корутину в фоновом потоке
@@ -140,15 +160,13 @@ class DivisionsListFragment : Fragment() {
             launch(Dispatchers.Main) {
                 binding.refresh.isRefreshing = true
             }
+            // Получаем данные пользователя
+            val userDataOk = viewModel.fetchUserData()
+            // Если произошла ошибка - список площадок не получаем
+            if (userDataOk && loadDivisions) {
+                viewModel.fetchDivisions()
+            }
             // Выполняем две задачи параллельно: загрузка данных пользователя и списка подразделений
-            awaitAll(
-                async {
-                    viewModel.fetchUserData()
-                },
-                async {
-                    viewModel.fetchDivisions()
-                }
-            )
             // Скрываем индикатор обновления
             launch(Dispatchers.Main) {
                 binding.refresh.isRefreshing = false

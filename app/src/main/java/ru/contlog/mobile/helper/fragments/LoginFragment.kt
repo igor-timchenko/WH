@@ -1,6 +1,7 @@
 package ru.contlog.mobile.helper.fragments
 
 // Импорты необходимых классов и библиотек Android и Kotlin
+import android.animation.Animator
 import android.annotation.SuppressLint                    // Для подавления предупреждений компилятора
 import android.content.Context                          // Контекст приложения/активности
 import android.net.ConnectivityManager                  // Системный сервис для проверки подключения к сети
@@ -8,11 +9,17 @@ import android.net.NetworkCapabilities                 // Возможности
 import android.os.Build                                 // Информация о версии Android
 import android.os.Bundle                                // Контейнер для передачи данных между компонентами
 import android.text.Editable                            // Тип для изменяемого текста (используется в TextWatcher)
+import android.util.Log
 import android.view.LayoutInflater                      // Создание View из XML-разметки
 import android.view.View                                // Базовый класс UI-элемента
+import android.view.ViewAnimationUtils
 import android.view.ViewGroup                           // Контейнер для View
 import android.widget.Toast                             // Всплывающее уведомление
+import androidx.core.animation.doOnEnd
+import androidx.core.animation.doOnStart
 import androidx.core.content.ContextCompat             // Безопасное получение ресурсов и цветов
+import androidx.core.view.isInvisible
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment                   // Базовый класс фрагмента
 import androidx.fragment.app.activityViewModels        // Делегат для получения ViewModel, привязанной к активности
 import androidx.lifecycle.lifecycleScope               // Область корутин, привязанная к жизненному циклу
@@ -24,6 +31,7 @@ import ru.contlog.mobile.helper.R                       // Сгенериров�
 import ru.contlog.mobile.helper.databinding.FragmentLoginBinding // ViewBinding для этого фрагмента
 import ru.contlog.mobile.helper.repo.Api                // Объект для выполнения сетевых запросов
 import ru.contlog.mobile.helper.vm.AppViewModel         // Общий ViewModel для хранения состояния приложения
+import kotlin.math.hypot
 
 // Класс фрагмента экрана авторизации
 class LoginFragment : Fragment() {
@@ -102,11 +110,7 @@ class LoginFragment : Fragment() {
                 // Активируем поле ввода кода только при валидном номере
                 binding.CodeInput.isEnabled = isPhoneValid
 
-                // Если номер валиден и SMS ещё не запрашивался — отправляем запрос
-                if (isPhoneValid && !smsRequested) {
-                    smsRequested = true
-                    requestSmsCode(clean)
-                }
+                revealGetAuthCodeButton(show=isPhoneValid)
 
                 // Если длина номера стала меньше 10 и SMS уже запрашивался — сбрасываем состояние
                 if (clean.length < 10 && smsRequested) {
@@ -148,6 +152,15 @@ class LoginFragment : Fragment() {
         } catch (e: Exception) {
             // На случай ошибки (например, пакет удалён) — показываем заглушку
             binding.appVersionText.text = "Версия: неизвестна"
+        }
+
+        binding.getAuthCode.setOnClickListener {
+            val digitsOnly = binding.PhoneInput.text.toString().replace(Regex("\\D"), "")
+
+            if (digitsOnly.length == 10 && !smsRequested) {
+                smsRequested = true
+                requestSmsCode(digitsOnly)
+            }
         }
     }
 
@@ -295,6 +308,42 @@ class LoginFragment : Fragment() {
         binding.CodeInput.visibility = View.GONE
         binding.CodeInput.isEnabled = false
         binding.CodeInput.setText("")
+
+        revealGetAuthCodeButton(show=false)
+    }
+
+    private var nextViewState: Int? = null
+    private var animation: Animator? = null
+    private fun revealGetAuthCodeButton(show: Boolean) {
+        if (binding.getAuthCode.isInvisible && !show && nextViewState != View.INVISIBLE) {
+            return
+        }
+
+        val cx = binding.getAuthCode.width / 2
+        val cy = binding.getAuthCode.height / 2
+        val circumcircleRadius = hypot(cx.toDouble(), cy.toDouble()).toFloat()
+        val zeroRadius = 0f
+
+        val starting = if (show) zeroRadius else circumcircleRadius
+        val ending = if (show) circumcircleRadius else zeroRadius
+
+        nextViewState = if (show) View.VISIBLE else View.INVISIBLE
+
+        animation?.cancel()
+        animation = ViewAnimationUtils.createCircularReveal(
+            binding.getAuthCode,
+            cx, cy,
+            starting, ending
+        )
+        animation!!.doOnStart {
+            binding.getAuthCode.visibility = View.VISIBLE
+        }
+        animation!!.doOnEnd {
+            binding.getAuthCode.visibility = nextViewState ?: (if (show) View.VISIBLE else View.INVISIBLE)
+            animation = null
+            nextViewState = null
+        }
+        animation!!.start()
     }
 
     // Форматирование номера по маске: " (XXX) XXX-XX-XX"
@@ -331,5 +380,9 @@ class LoginFragment : Fragment() {
             @Suppress("DEPRECATION")
             connectivityManager.activeNetworkInfo?.isConnected ?: false
         }
+    }
+
+    companion object {
+        const val TAG = "Contlog.LoginFragment"
     }
 }

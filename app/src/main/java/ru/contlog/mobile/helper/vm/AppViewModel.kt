@@ -46,7 +46,7 @@ class AppViewModel(private val appPreferencesRepository: AppPreferencesRepositor
 
     // MutableLiveData для списка подразделений (внутреннее изменяемое состояние)
     private val _division: MutableLiveData<List<Division>> by lazy {
-        MutableLiveData<List<Division>>(emptyList())
+        MutableLiveData<List<Division>>(appPreferencesRepository.getDivisionsList("app_divisionsList") ?: mutableListOf())
     }
     // Публичный LiveData для списка подразделений
     val division: LiveData<List<Division>> = _division
@@ -63,17 +63,27 @@ class AppViewModel(private val appPreferencesRepository: AppPreferencesRepositor
         _errors.value = mutableListOf()
     }
 
+    private val _internetAvailable: MutableLiveData<Boolean> by lazy {
+        MutableLiveData<Boolean>(true)
+    }
+    val internetAvailable: LiveData<Boolean> = _internetAvailable
+    fun setInternetAvailableState(available: Boolean) {
+        _internetAvailable.value = available
+    }
+
     // Suspend-функция для загрузки данных пользователя с сервера
-    suspend fun fetchUserData() {
+    suspend fun fetchUserData() : Boolean {
         // Выполняем запрос к API с использованием сохранённых данных авторизации
         val result = Api.User.getUserData(apiAuthData!!)
-        result.fold(
+        return result.fold(
             // В случае успеха (получен UserData)
             { userData ->
                 // Обновляем LiveData на главном потоке (UI-поток)
                 viewModelScope.launch(Dispatchers.Main) {
                     this@AppViewModel._userData.value = userData
                 }
+
+                true
             },
             // В случае ошибки
             { error ->
@@ -84,6 +94,8 @@ class AppViewModel(private val appPreferencesRepository: AppPreferencesRepositor
                         it
                     }
                 }
+
+                false
             }
         )
     }
@@ -95,6 +107,7 @@ class AppViewModel(private val appPreferencesRepository: AppPreferencesRepositor
         result.fold(
             // В случае успеха (получен список Division)
             { divisions ->
+                appPreferencesRepository.saveDivisionsList("app_divisionsList", divisions)
                 // Обновляем LiveData на главном потоке
                 viewModelScope.launch(Dispatchers.Main) {
                     this@AppViewModel._division.value = divisions

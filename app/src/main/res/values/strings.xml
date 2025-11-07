@@ -39,4 +39,7 @@
     <string name="todo">TODO</string>
     <string name="menu_main">Главная</string>
     <string name="menu_profile">Профиль</string>
+    <string name="label_internet_unavailable_heading">Сеть недоступна</string>
+    <string name="label_internet_unavailable_body">Проверьте соединение.\nЭтот экран пропадёт автоматически про появлении доступа к сети.</string>
+    <string name="button_internet_unavailable_manual_check">Проверить вручную</string>
 </resources>

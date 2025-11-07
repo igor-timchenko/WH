@@ -1,8 +1,15 @@
 package ru.contlog.mobile.helper
 
 // Импорты системных и вспомогательных классов Android
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
 import android.os.Build                    // Для проверки версии Android API
 import android.os.Bundle                     // Для работы с состоянием активности
+import android.telecom.ConnectionService
+import android.util.Log
 import android.view.View                     // Базовый класс UI-элемента
 import android.view.WindowInsets             // Для работы с системными вставками (status bar, navigation bar)
 // Включает edge-to-edge режим (полноэкранный интерфейс)
@@ -11,6 +18,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 // Базовый класс активности с поддержкой Material Design
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.getSystemService
 // Область корутин, привязанная к жизненному циклу активности
 import androidx.lifecycle.lifecycleScope
 // Утилиты для навигации между фрагментами
@@ -20,6 +28,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 // ViewBinding для активности
 import ru.contlog.mobile.helper.databinding.ActivityMainBinding
+import ru.contlog.mobile.helper.repo.Api
 // Репозиторий для работы с настройками приложения
 import ru.contlog.mobile.helper.repo.AppPreferencesRepository
 // ViewModel приложения
@@ -35,6 +44,36 @@ class MainActivity : AppCompatActivity() {
     // ViewModel, привязанная к активности, создаваемая через фабрику с репозиторием настроек
     private val viewModel: AppViewModel by viewModels {
         AppViewModelFactory(AppPreferencesRepository(this))
+    }
+
+    private val connectivityManager: ConnectivityManager by lazy {
+        getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
+    }
+
+    val networkQueryCallback = object : ConnectivityManager.NetworkCallback() {
+        override fun onLost(network: Network) {
+            super.onLost(network)
+
+            binding.root.post {
+                viewModel.setInternetAvailableState(available = false)
+            }
+        }
+
+        override fun onAvailable(network: Network) {
+            super.onAvailable(network)
+
+            binding.root.post {
+                viewModel.setInternetAvailableState(available = true)
+            }
+        }
+
+        override fun onUnavailable() {
+            super.onUnavailable()
+
+            binding.root.post {
+                viewModel.setInternetAvailableState(available = false)
+            }
+        }
     }
 
     // Метод вызывается при создании активности
@@ -122,6 +161,40 @@ class MainActivity : AppCompatActivity() {
 
         // Закомментированная строка: отображение версии приложения (возможно, для отладки)
         // binding.versionLabel.text = getString(R.string.app_version, BuildConfig.VERSION_NAME)
+
+        val networkQueryRequest = NetworkRequest.Builder()
+            .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+            .addCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
+            .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
+            .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+            .build()
+
+        connectivityManager.registerNetworkCallback(networkQueryRequest, networkQueryCallback)
+
+        viewModel.internetAvailable.observe(this) { internetAvailable ->
+            binding.noInternetOverlay.visibility = if (internetAvailable) View.GONE else View.VISIBLE
+        }
+        binding.manualInternetCheck.setOnClickListener {
+            manualInternetCheck()
+        }
+    }
+
+    override fun onDestroy() {
+        connectivityManager.unregisterNetworkCallback(networkQueryCallback)
+
+        super.onDestroy()
+    }
+
+    private fun manualInternetCheck() {
+        binding.manualInternetCheck.isEnabled = false
+        lifecycleScope.launch(Dispatchers.IO) {
+            val isServiceAvailable = Api.Service.serviceAvailable()
+
+            launch(Dispatchers.Main) {
+                viewModel.setInternetAvailableState(isServiceAvailable)
+            }
+        }
+        binding.manualInternetCheck.isEnabled = true
     }
 
     // Сопутствующий объект с константами класса
