@@ -174,9 +174,6 @@ class MainActivity : AppCompatActivity() {
         viewModel.internetAvailable.observe(this) { internetAvailable ->
             binding.noInternetOverlay.visibility = if (internetAvailable) View.GONE else View.VISIBLE
         }
-        binding.manualInternetCheck.setOnClickListener {
-            manualInternetCheck()
-        }
     }
 
     override fun onDestroy() {
@@ -186,7 +183,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun manualInternetCheck() {
-        binding.manualInternetCheck.isEnabled = false
         lifecycleScope.launch(Dispatchers.IO) {
             val isServiceAvailable = Api.Service.serviceAvailable()
 
@@ -194,7 +190,6 @@ class MainActivity : AppCompatActivity() {
                 viewModel.setInternetAvailableState(isServiceAvailable)
             }
         }
-        binding.manualInternetCheck.isEnabled = true
     }
 
     // Сопутствующий объект с константами класса
