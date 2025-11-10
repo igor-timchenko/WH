@@ -116,6 +116,12 @@ class LoginFragment : Fragment() {
                 if (clean.length < 10 && smsRequested) {
                     resetState()
                 }
+                // 🔹 Больше не отключаем поле при вводе 10 цифр — отключаем только после отправки SMS
+                // binding.PhoneInput.isEnabled = !isPhoneValid ← УДАЛЕНО
+
+                if (clean.length < 10 && smsRequested) {
+                    resetState()
+                }
             }
         })
 
@@ -200,6 +206,10 @@ class LoginFragment : Fragment() {
                             ContextCompat.getColor(requireContext(), android.R.color.holo_green_dark)
                         )
                         binding.PhoneSentMessage.visibility = View.VISIBLE
+
+                        
+                        // 🔹 Отключаем поле ввода номера после отправки SMS
+                        binding.PhoneInput.isEnabled = false
 
                         // Показываем элементы, связанные с вводом кода
                         binding.TextCodeInput.visibility = View.VISIBLE
@@ -310,6 +320,9 @@ class LoginFragment : Fragment() {
         binding.CodeInput.setText("")
 
         revealGetAuthCodeButton(show=false)
+        
+        // 🔹 Возвращаем активность полю при сбросе
+        binding.PhoneInput.isEnabled = true
     }
 
     private var nextViewState: Int? = null
