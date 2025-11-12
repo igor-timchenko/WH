@@ -19,5 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Помощник Континент"
+rootProject.name = "Поставщик Континент"
 include(":app")
