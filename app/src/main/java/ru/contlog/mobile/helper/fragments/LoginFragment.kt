@@ -1,51 +1,59 @@
 package ru.contlog.mobile.helper.fragments
 
-// Импорты необходимых классов и библиотек Android и Kotlin
 import android.animation.Animator
-import android.annotation.SuppressLint                    // Для подавления предупреждений компилятора
-import android.content.Context                          // Контекст приложения/активности
-import android.net.ConnectivityManager                  // Системный сервис для проверки подключения к сети
-import android.net.NetworkCapabilities                 // Возможности текущей сети (доступ в интернет и т.д.)
-import android.os.Build                                 // Информация о версии Android
-import android.os.Bundle                                // Контейнер для передачи данных между компонентами
-import android.text.Editable                            // Тип для изменяемого текста (используется в TextWatcher)
+import android.annotation.SuppressLint
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.os.Build
+import android.os.Bundle
+import android.text.Editable
 import android.util.Log
-import android.view.LayoutInflater                      // Создание View из XML-разметки
-import android.view.View                                // Базовый класс UI-элемента
+import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewAnimationUtils
-import android.view.ViewGroup                           // Контейнер для View
-import android.widget.Toast                             // Всплывающее уведомление
+import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.animation.doOnEnd
 import androidx.core.animation.doOnStart
-import androidx.core.content.ContextCompat             // Безопасное получение ресурсов и цветов
+import androidx.core.content.ContextCompat
 import androidx.core.view.isInvisible
-import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment                   // Базовый класс фрагмента
-import androidx.fragment.app.activityViewModels        // Делегат для получения ViewModel, привязанной к активности
-import androidx.lifecycle.lifecycleScope               // Область корутин, привязанная к жизненному циклу
-import androidx.navigation.fragment.findNavController  // Утилита для навигации между фрагментами
-import com.google.android.material.dialog.MaterialAlertDialogBuilder // Диалоги Material Design
-import kotlinx.coroutines.Dispatchers                   // Диспетчеры корутин (Main, IO и т.д.)
-import kotlinx.coroutines.launch                        // Запуск корутины
-import ru.contlog.mobile.helper.R                       // Сгенерированный класс ресурсов
-import ru.contlog.mobile.helper.databinding.FragmentLoginBinding // ViewBinding для этого фрагмента
-import ru.contlog.mobile.helper.repo.Api                // Объект для выполнения сетевых запросов
-import ru.contlog.mobile.helper.vm.AppViewModel         // Общий ViewModel для хранения состояния приложения
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.navigation.fragment.findNavController
+import com.google.android.gms.auth.api.phone.SmsRetriever
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import ru.contlog.mobile.helper.R
+import ru.contlog.mobile.helper.databinding.FragmentLoginBinding
+import ru.contlog.mobile.helper.repo.Api
+import ru.contlog.mobile.helper.vm.AppViewModel
 import kotlin.math.hypot
 
-// Класс фрагмента экрана авторизации
 class LoginFragment : Fragment() {
-
-    // Безопасная реализация ViewBinding с защитой от утечек памяти
     private var _binding: FragmentLoginBinding? = null
     private val binding get() = _binding!!
 
-    // Получение ViewModel, общего для всей активности (данные сохраняются при навигации)
     private val viewModel: AppViewModel by activityViewModels()
-    // Флаг для предотвращения повторной отправки SMS при вводе номера
     private var smsRequested = false
 
-    // Создание корневого представления фрагмента из layout-файла
+    // ✅ BroadcastReceiver для получения кода из SMS
+    private val smsCodeReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent?.action == "SMS_CODE_RECEIVED") {
+                val code = intent.getStringExtra("code") ?: return
+                binding.CodeInput.setText(code)
+                verifyCode(code) // Автоматически проверить
+            }
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -55,69 +63,73 @@ class LoginFragment : Fragment() {
         return binding.root
     }
 
-    // Настройка UI после создания представления
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        bind() // Инициализация слушателей и начального состояния
+        bind()
+
+        // ✅ Регистрируем получение кода
+        val filter = IntentFilter("SMS_CODE_RECEIVED")
+        LocalBroadcastManager.getInstance(requireContext())
+            .registerReceiver(smsCodeReceiver, filter)
+
+        // ✅ Запускаем SMS Retriever
+        startSmsRetriever()
     }
 
-    // Освобождение ресурсов при уничтожении View для предотвращения утечек
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+        // ✅ Отменяем регистрацию
+        LocalBroadcastManager.getInstance(requireContext())
+            .unregisterReceiver(smsCodeReceiver)
     }
 
-    // Метод инициализации UI-элементов и слушателей
-    @SuppressLint("SetTextI18n") // Подавление предупреждения о конкатенации строк для text
+    // ✅ Запуск SMS Retriever
+    private fun startSmsRetriever() {
+        val client = SmsRetriever.getClient(requireActivity())
+        val task = client.startSmsRetriever()
+
+        task.addOnSuccessListener {
+            Log.d("SMS", "SMS Retriever started")
+        }
+
+        task.addOnFailureListener { e ->
+            Log.e("SMS", "Failed to start SMS Retriever: ${e.message}")
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
     private fun bind() {
-        // Изначально скрываем все элементы, связанные с вводом кода подтверждения
         binding.TextCodeInput.visibility = View.GONE
         binding.CodeInput.visibility = View.GONE
         binding.CodeSentMessage.visibility = View.GONE
-        // Деактивируем поле ввода кода (нельзя ввести код до получения SMS)
         binding.CodeInput.isEnabled = false
 
-        // Слушатель изменений в поле ввода номера телефона с автоматическим форматированием
         binding.PhoneInput.addTextChangedListener(object : android.text.TextWatcher {
-            // Флаг для предотвращения зацикливания при программном изменении текста
             private var isFormatting = false
 
-            // Вызывается до изменения текста (не используется)
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
-            // Вызывается во время изменения текста (не используется)
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
-            // Основная логика форматирования номера после изменения текста
             override fun afterTextChanged(s: Editable?) {
-                // Защита от рекурсии и null-значений
                 if (isFormatting || s == null) return
 
-                // Оставляем только цифры из введённого текста
                 val digitsOnly = s.toString().replace(Regex("\\D"), "")
-                // Ограничиваем длину до 10 цифр (номер без кода страны)
                 val clean = if (digitsOnly.length > 10) digitsOnly.substring(0, 10) else digitsOnly
-                // Форматируем номер по маске
                 val formatted = formatPhoneNumber(clean)
 
-                // Устанавливаем отформатированный текст обратно в поле ввода
                 isFormatting = true
                 s.replace(0, s.length, formatted)
-                // Устанавливаем курсор в конец текста
                 binding.PhoneInput.setSelection(formatted.length)
                 isFormatting = false
 
-                // Проверка валидности номера (ровно 10 цифр)
                 val isPhoneValid = clean.length == 10
-                // Активируем поле ввода кода только при валидном номере
                 binding.CodeInput.isEnabled = isPhoneValid
 
-                revealGetAuthCodeButton(show=isPhoneValid)
-
-                // Если длина номера стала меньше 10 и SMS уже запрашивался — сбрасываем состояние
-                if (clean.length < 10 && smsRequested) {
-                    resetState()
+                if (!smsRequested) {
+                    revealGetAuthCodeButton(show = isPhoneValid)
+                } else {
+                    revealGetAuthCodeButton(show = false)
                 }
-                // 🔹 Больше не отключаем поле при вводе 10 цифр — отключаем только после отправки SMS
-                // binding.PhoneInput.isEnabled = !isPhoneValid ← УДАЛЕНО
 
                 if (clean.length < 10 && smsRequested) {
                     resetState()
@@ -125,44 +137,34 @@ class LoginFragment : Fragment() {
             }
         })
 
-        // Слушатель изменений в поле ввода кода подтверждения
         binding.CodeInput.addTextChangedListener(object : android.text.TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
             override fun afterTextChanged(s: Editable?) {
-                // Получаем введённый код, удаляя пробелы по краям
                 val code = s?.toString()?.trim() ?: ""
-                // Ограничиваем длину кода до 5 символов
                 if (code.length > 5) {
                     s?.delete(5, code.length)
                     return
                 }
-                // Если введено ровно 5 цифр — запускаем проверку кода
                 if (code.length == 5 && code.all { it.isDigit() }) {
-                    // Скрываем подсказку "Код должен содержать 5 символов"
                     binding.CodeSentMessage.visibility = View.INVISIBLE
                     verifyCode(code)
                 } else if (code.isNotEmpty()) {
-                    // Если введено 1–4 символа — показываем подсказку
                     binding.CodeSentMessage.visibility = View.VISIBLE
                 }
             }
         })
 
-        // Отображение версии приложения в футере
         try {
-            // Получаем информацию о пакете (включая версию)
             val packageInfo = requireContext().packageManager.getPackageInfo(requireContext().packageName, 0)
             val version = packageInfo.versionName ?: "неизвестна"
             binding.appVersionText.text = "Версия: $version"
         } catch (e: Exception) {
-            // На случай ошибки (например, пакет удалён) — показываем заглушку
             binding.appVersionText.text = "Версия: неизвестна"
         }
 
         binding.getAuthCode.setOnClickListener {
             val digitsOnly = binding.PhoneInput.text.toString().replace(Regex("\\D"), "")
-
             if (digitsOnly.length == 10 && !smsRequested) {
                 smsRequested = true
                 requestSmsCode(digitsOnly)
@@ -170,13 +172,10 @@ class LoginFragment : Fragment() {
         }
     }
 
-    // Метод отправки запроса на SMS с кодом подтверждения
     @SuppressLint("InlinedApi")
     private fun requestSmsCode(phoneNumber: String) {
-        // Скрываем предыдущее сообщение об отправке/ошибке
         binding.PhoneSentMessage.visibility = View.INVISIBLE
 
-        // Проверка наличия интернет-соединения перед отправкой запроса
         if (!isNetworkAvailable()) {
             binding.PhoneSentMessage.text = "Проверьте интернет соединение"
             binding.PhoneSentMessage.setTextColor(
@@ -186,41 +185,29 @@ class LoginFragment : Fragment() {
             return
         }
 
-        // Запуск сетевого запроса в фоновом потоке
         lifecycleScope.launch(Dispatchers.IO) {
-            val result = Api.Auth.getSms("7$phoneNumber") // Добавляем код страны "7"
+            val result = Api.Auth.getSms("7$phoneNumber")
 
-            // Обновление UI в главном потоке
             launch(Dispatchers.Main) {
-                // Защита от вызова после уничтожения фрагмента
                 if (!isAdded || _binding == null) return@launch
 
                 result.fold(
                     onSuccess = {
-                        // Форматируем номер для отображения
                         val formattedPhone = formatPhoneNumber(phoneNumber)
-                        // Устанавливаем текст сообщения "Код отправлен на ..."
                         binding.PhoneSentMessage.text = getString(R.string.smsSentTo, formattedPhone)
-                        // Задаём зелёный цвет (успех)
                         binding.PhoneSentMessage.setTextColor(
                             ContextCompat.getColor(requireContext(), android.R.color.holo_green_dark)
                         )
                         binding.PhoneSentMessage.visibility = View.VISIBLE
 
-                        // 🔹 Отключаем поле ввода номера после отправки SMS
-                        binding.PhoneInput.isEnabled = false
-
-                        // Показываем элементы, связанные с вводом кода
                         binding.TextCodeInput.visibility = View.VISIBLE
                         binding.CodeInput.visibility = View.VISIBLE
-                        binding.CodeSentMessage.visibility = View.GONE // Подсказка скрыта изначально
+                        binding.CodeSentMessage.visibility = View.GONE
 
-                        // Активируем поле, очищаем его и устанавливаем фокус
                         binding.CodeInput.isEnabled = true
                         binding.CodeInput.setText("")
                         binding.CodeInput.requestFocus()
 
-                        // Показываем подсказку через 1 секунду, если поле осталось пустым
                         binding.CodeInput.postDelayed({
                             if (isAdded && _binding != null) {
                                 val currentCode = binding.CodeInput.text?.toString()?.trim()
@@ -229,9 +216,10 @@ class LoginFragment : Fragment() {
                                 }
                             }
                         }, 1000)
+
+                        revealGetAuthCodeButton(show = false)
                     },
                     onFailure = { _ ->
-                        // При ошибке (номер не зарегистрирован) показываем красное сообщение
                         val formattedPhone = formatPhoneNumber(phoneNumber)
                         binding.PhoneSentMessage.text = getString(R.string.error_user_not_found, formattedPhone)
                         binding.PhoneSentMessage.setTextColor(
@@ -239,21 +227,20 @@ class LoginFragment : Fragment() {
                         )
                         binding.PhoneSentMessage.visibility = View.VISIBLE
 
-                        // Скрываем всё, что связано с вводом кода
                         binding.TextCodeInput.visibility = View.GONE
                         binding.CodeInput.visibility = View.GONE
                         binding.CodeSentMessage.visibility = View.GONE
                         binding.CodeInput.isEnabled = false
                         binding.CodeInput.setText("")
+
+                        revealGetAuthCodeButton(show = true)
                     }
                 )
             }
         }
     }
 
-    // Метод проверки введённого кода подтверждения
     private fun verifyCode(code: String) {
-        // Проверка интернета перед отправкой кода
         if (!isNetworkAvailable()) {
             MaterialAlertDialogBuilder(requireContext())
                 .setTitle("Нет соединения")
@@ -263,36 +250,26 @@ class LoginFragment : Fragment() {
             return
         }
 
-        // Получаем сырой ввод из поля телефона и оставляем только цифры
         val rawInput = binding.PhoneInput.text?.toString() ?: ""
-        val phoneNumber = rawInput.replace(Regex("\\D"), "") // только цифры
-        // Дополнительная проверка длины и содержимого (защита от гонок)
+        val phoneNumber = rawInput.replace(Regex("\\D"), "")
         if (phoneNumber.length != 10 || !phoneNumber.all { it.isDigit() }) return
 
-        // Запуск проверки кода в фоновом потоке
         lifecycleScope.launch(Dispatchers.IO) {
             val result = Api.Auth.checkSms("7$phoneNumber", code)
 
-            // Обновление UI в главном потоке
             launch(Dispatchers.Main) {
-                // Защита от вызова после уничтожения фрагмента
                 if (!isAdded || _binding == null) return@launch
 
                 result.fold(
                     onSuccess = { apiAuthData ->
-                        // Сохраняем данные авторизации в ViewModel
                         viewModel.login = phoneNumber
                         viewModel.apiAuthData = apiAuthData
-                        // Скрываем все сообщения
                         binding.PhoneSentMessage.visibility = View.INVISIBLE
                         binding.CodeSentMessage.visibility = View.INVISIBLE
-                        // Переход к следующему экрану
                         findNavController().navigate(R.id.action_loginFragment_to_workSitesFragment)
-                        // Показ Toast-уведомления об успешной авторизации (выполняется после корутины)
                         Toast.makeText(requireContext(), "Авторизация успешна!!!", Toast.LENGTH_SHORT).show()
                     },
                     onFailure = { _ ->
-                        // При неверном коде очищаем поле и показываем диалог
                         binding.CodeInput.setText("")
                         binding.CodeSentMessage.visibility = View.VISIBLE
                         MaterialAlertDialogBuilder(requireContext())
@@ -308,7 +285,6 @@ class LoginFragment : Fragment() {
         }
     }
 
-    // Метод сброса состояния (при удалении цифр из номера)
     private fun resetState() {
         smsRequested = false
         binding.PhoneSentMessage.visibility = View.INVISIBLE
@@ -318,10 +294,7 @@ class LoginFragment : Fragment() {
         binding.CodeInput.isEnabled = false
         binding.CodeInput.setText("")
 
-        revealGetAuthCodeButton(show=false)
-
-        // 🔹 Возвращаем активность полю при сбросе
-        binding.PhoneInput.isEnabled = true
+        revealGetAuthCodeButton(show = true)
     }
 
     private var nextViewState: Int? = null
@@ -358,11 +331,10 @@ class LoginFragment : Fragment() {
         animation!!.start()
     }
 
-    // Форматирование номера по маске: " (XXX) XXX-XX-XX"
     private fun formatPhoneNumber(digits: String): String {
         val clean = digits.take(10)
         return when (clean.length) {
-            0 -> " " // Пробел вместо пустой строки — для стабильности UI
+            0 -> " "
             1 -> " (${clean}"
             2 -> " (${clean}"
             3 -> " (${clean}"
@@ -377,18 +349,14 @@ class LoginFragment : Fragment() {
         }
     }
 
-    // Проверка наличия активного интернет-соединения
-    @SuppressLint("MissingPermission", "ObsoleteSdkInt") // Подавление предупреждений для старых API
+    @SuppressLint("MissingPermission", "ObsoleteSdkInt")
     private fun isNetworkAvailable(): Boolean {
-        // Получаем системный сервис управления подключениями
         val connectivityManager = requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            // Для Android 6.0+ используем NetworkCapabilities
             val network = connectivityManager.activeNetwork ?: return false
             val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
             capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
         } else {
-            // Для старых версий используем устаревший метод (с подавлением предупреждения)
             @Suppress("DEPRECATION")
             connectivityManager.activeNetworkInfo?.isConnected ?: false
         }

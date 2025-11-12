@@ -1,3 +1,8 @@
+@file:Suppress("DEPRECATION")
+
+import io.grpc.internal.SharedResourceHolder.release
+import io.netty.util.ReferenceCountUtil.release
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -7,6 +12,21 @@ plugins {
 android {
     namespace = "ru.contlog.mobile.helper"
     compileSdk = 36
+
+    signingConfigs {
+        create("release") {
+            storeFile = file("D:/File SSD C=D/Документы/Supplier_CONTINENT/Keys/SUPPLIER_CONTINENT1.jks")
+            storePassword = "123456"
+            keyAlias = "mykey"
+            keyPassword = "123456"
+        }
+    }
+
+    buildTypes {
+        getByName("release") {
+            signingConfig = signingConfigs.getByName("release")
+        }
+    }
 
     defaultConfig {
         applicationId = "ru.contlog.mobile.helper"
@@ -43,6 +63,10 @@ android {
 
 dependencies {
 
+    //noinspection UseTomlInstead
+    implementation("com.google.android.gms:play-services-auth:21.4.0")
+    implementation("com.google.android.gms:play-services-auth-api-phone:18.3.0")
+    implementation("androidx.localbroadcastmanager:localbroadcastmanager:1.1.0")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
@@ -60,6 +84,8 @@ dependencies {
     implementation(libs.zxing.android.embedded)
     implementation(libs.glide)
     implementation(libs.androidx.ui.test)
+    implementation(libs.androidx.navigation.fragment.ktx)
+    implementation(libs.androidx.navigation.ui.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
