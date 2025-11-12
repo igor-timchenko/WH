@@ -1,4 +1,5 @@
 // Код получения хэша приложения
+// Обновили
 
 package ru.contlog.mobile.helper;
 
