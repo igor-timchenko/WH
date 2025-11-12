@@ -84,6 +84,7 @@ class LoginFragment : Fragment() {
             .unregisterReceiver(smsCodeReceiver)
     }
 
+
     // ✅ Запуск SMS Retriever
     private fun startSmsRetriever() {
         val client = SmsRetriever.getClient(requireActivity())
