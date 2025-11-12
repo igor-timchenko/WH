@@ -63,7 +63,7 @@ android {
 
 dependencies {
 
-    //noinspection UseTomlInstead  -  не проводите инспекцию, используя Tomlinstead // Обновили
+    //noinspection UseTomlInstead  -  не проводите инспекцию, используя Tomlinstead // Обновили1
     implementation("com.google.android.gms:play-services-auth:21.4.0")
     implementation("com.google.android.gms:play-services-auth-api-phone:18.3.0")
     implementation("androidx.localbroadcastmanager:localbroadcastmanager:1.1.0")
