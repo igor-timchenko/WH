@@ -1,4 +1,4 @@
-// Обновили
+// Обновили12
 package ru.contlog.mobile.helper
 
 import android.net.ConnectivityManager
