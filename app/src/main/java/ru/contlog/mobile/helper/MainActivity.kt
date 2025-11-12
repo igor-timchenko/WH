@@ -126,6 +126,7 @@ class MainActivity : AppCompatActivity() {
         viewModel.internetAvailable.observe(this) { internetAvailable ->
             binding.noInternetOverlay.visibility = if (internetAvailable) View.GONE else View.VISIBLE
         }
+        // Код получения хэша приложения
         val hash = ru.contlog.mobile.helper.WH_SUPPLIER_CONTINENT.getSignature(this)
         Log.i(TAG, "App hash: $hash")
     }

@@ -1,3 +1,4 @@
+// Обновили
 package ru.contlog.mobile.helper.fragments
 
 import android.animation.Animator

@@ -1,3 +1,5 @@
+// Код получения хэша приложения
+
 package ru.contlog.mobile.helper;
 
 import android.content.Context;
