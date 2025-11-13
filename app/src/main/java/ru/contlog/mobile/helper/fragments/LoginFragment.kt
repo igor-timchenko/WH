@@ -75,7 +75,7 @@ class LoginFragment : Fragment() {
         binding.TextCodeInput.visibility = View.GONE
         binding.CodeInput.visibility = View.GONE
         binding.CodeSentMessage.visibility = View.GONE
-        // Деактивируем поле ввода кода (нельзя ввести код до получения SMS)
+        // Деактивируем поле ввода кода (нельзя ввести код до получения SMS) //
         binding.CodeInput.isEnabled = false
 
         // Слушатель изменений в поле ввода номера телефона с автоматическим форматированием
