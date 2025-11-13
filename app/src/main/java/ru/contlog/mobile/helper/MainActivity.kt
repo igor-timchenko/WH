@@ -1,4 +1,3 @@
-// Обновили
 package ru.contlog.mobile.helper
 
 import android.net.ConnectivityManager
@@ -7,12 +6,13 @@ import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.view.WindowInsets
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.core.content.getSystemService
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import kotlinx.coroutines.Dispatchers
@@ -66,12 +66,12 @@ class MainActivity : AppCompatActivity() {
             window.decorView.setOnApplyWindowInsetsListener { view, insets ->
                 val statusBarInsets = insets.getInsets(WindowInsets.Type.statusBars())
                 val navigationBarInsets = insets.getInsets(WindowInsets.Type.navigationBars())
-                view.setBackgroundColor(getColor(R.color.statusBarColor))
+                view.setBackgroundColor(ContextCompat.getColor(this, R.color.statusBarColor))
                 view.setPadding(0, statusBarInsets.top, 0, navigationBarInsets.bottom)
                 insets
             }
         } else {
-            window.statusBarColor = getColor(R.color.statusBarColor)
+            window.statusBarColor = ContextCompat.getColor(this, R.color.statusBarColor)
             binding.root.fitsSystemWindows = true
         }
 
@@ -127,9 +127,6 @@ class MainActivity : AppCompatActivity() {
         viewModel.internetAvailable.observe(this) { internetAvailable ->
             binding.noInternetOverlay.visibility = if (internetAvailable) View.GONE else View.VISIBLE
         }
-        // Код получения хэша приложения
-        val hash = ru.contlog.mobile.helper.WH_SUPPLIER_CONTINENT.getSignature(this)
-        Log.i(TAG, "App hash: $hash")
     }
 
     override fun onDestroy() {
