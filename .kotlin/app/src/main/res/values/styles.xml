@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <style name="MyCustomButtonStyle" parent="Widget.Material3.Button">
+        <item name="backgroundTint">@color/button_background_tint</item>
+        <item name="android:textColor">@color/button_text_color_selector</item>
+    </style>
+
+    <style name="MyCustomTextInputStyle" parent="Widget.Material3.TextInputEditText.OutlinedBox">
+        <item name="android:background">@drawable/rounded_edittext_background</item>
+        <item name="android:textColor">@color/textColor</item>
+        <item name="android:textColorHint">@color/hintTextColor</item>
+    </style>
+</resources>

@@ -63,6 +63,81 @@ class LoginFragment : Fragment() {
         }
     }
 
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 1001 && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            // ✅ Запускаем проверку SMS
+            binding.CodeInput.postDelayed({
+                checkSmsForCode()
+            }, 2000)
+
+            // Повторяем проверку каждые 3 секунды
+            binding.CodeInput.postDelayed(object : Runnable {
+                override fun run() {
+                    if (!smsRetrieved) {
+                        checkSmsForCode()
+                        binding.CodeInput.postDelayed(this, 3000)
+                    }
+                }
+            }, 5000)
+        }
+    }
+
+    // ✅ Проверяем SMS вручную
+    @SuppressLint("UseKtx")
+    private fun checkSmsForCode() {
+        Log.d(TAG, "Checking SMS for code...")
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_SMS)
+            != PackageManager.PERMISSION_GRANTED) {
+            return
+        }
+
+        try {
+            val uri = android.net.Uri.parse("content://sms/inbox")
+            val contentResolver = requireContext().contentResolver
+            val cursor = contentResolver.query(
+                uri,
+                arrayOf("address", "body", "date"),
+                null, // фильтр по отправителю можно добавить
+                null,
+                "date DESC"
+            )
+
+            cursor?.use {
+                if (it.moveToFirst()) {
+                    val body = it.getString(it.getColumnIndexOrThrow("body"))
+                    Log.d(TAG, "SMS body: $body")
+                    // Проверяем формат: [#] Ваш код подтверждения:\n12345\n/hexCode
+                    if (body.startsWith("[#]")) {
+                        val lines = body.split("\n")
+                        if (lines.size >= 2) {
+                            val codeLine = lines[1].trim() // "92406"
+                            Log.d(TAG, "Code line: $codeLine")
+                            if (codeLine.length == 5 && codeLine.all { it.isDigit() }) {
+                                Log.d(TAG, "Found code: $codeLine")
+                                onSmsCodeReceived(codeLine)
+                            } else {
+                                Log.e(TAG, "Code line is not 5 digits: $codeLine")
+                            }
+                        } else {
+                            Log.e(TAG, "SMS does not have enough lines")
+                        }
+                    } else {
+                        Log.e(TAG, "SMS does not start with [#]")
+                    }
+                } else {
+                    Log.e(TAG, "No SMS found")
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error reading SMS: ${e.message}", e)
+        }
+    }
+
     // ✅ Запуск SMS Retriever (для совместимости)
     private fun startSmsRetriever() {
         val client = SmsRetriever.getClient(requireActivity())
@@ -82,10 +157,10 @@ class LoginFragment : Fragment() {
         if (smsRetrieved) return // Защита от повторного вызова
         smsRetrieved = true
 
-        binding.CodeInput.setText(code)
-        binding.CodeInput.setSelection(code.length)
+        binding.CodeInput.setText(code)     // ← Вот тут вставляется "92406"
+        binding.CodeInput.setSelection(code.length)     // Курсор в конец
         binding.CodeSentMessage.visibility = View.INVISIBLE
-        verifyCode(code)
+        verifyCode(code)            // Автоматически проверить
     }
 
     @SuppressLint("SetTextI18n")

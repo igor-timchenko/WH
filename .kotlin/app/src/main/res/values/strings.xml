@@ -1,0 +1,45 @@
+<resources>
+    <string name="app_name">Поставщик КОНТИНЕНТ PRO</string>
+    <string name="phoneHint">\u00A0(983)\u00A0255-25-25</string>
+    <string name="codeHint">00000</string>
+    <string name="buttonGetCode">Код</string>
+    <string name="buttonCheckCode">Войти</string>
+    <string name="auth_code">Код подтверждения</string>
+    <string name="phone_number">Введите номер телефона</string>
+    <string name="company_logo_cd">Логотип компании</string>
+    <string name="app_version">Версия: %s</string>
+
+    <string name="error_user_not_found">Пользователь с номером телефона +7\%1$s\ не зарегистрирован в компании. Обратитесь в отдел персонала. Или исправьте номер телефона!</string>
+
+    <string name="smsSentTo">СМС код отправлен на номер телефона +7%1$s</string>
+    <string name="smsSentCode">Код должен содержать 5 цифр</string>
+
+    <string name="errorSendingSMS">Ошибка отправки СМС</string>
+    <string name="errorCheckingSMS">Ошибка проверки СМС</string>
+    <string name="ok">Ок</string>
+    <string name="error_card_title">Возникли ошибки!</string>
+    <string name="retry_btn_label">Повторить</string>
+    <string name="exit_account_btn">Выйти из аккаунта</string>
+    <string name="cd_user_avatar">Аватар пользователя</string>
+    <string name="cd_open_division_btn">Кнопка открытия площадки</string>
+    <string name="label_divisions_list_empty">Список площадок пуст</string>
+    <string name="label_scan">Сканирование</string>
+    <string name="cd_scan_button">Кнопка сканнирования</string>
+    <string name="title_places_exp">Места хранения (%d шт.)</string>
+    <string name="label_no_product_places">Места хранения отсутствуют</string>
+    <string name="cd_product_image">Картинка товара</string>
+    <string name="label_leftovers">Остаток:</string>
+    <string name="label_leftovers_reserved">Резерв:</string>
+    <string name="label_supplier_batch">Партия:</string>
+    <string name="label_production_date">Дата производства:</string>
+    <string name="label_best_before">Срок годности:</string>
+    <string name="scanned_label">Отсканировано: %s</string>
+    <string name="no_places_found">Ничего не найдено</string>
+    <string name="do_scan_btn_label">Начать сканирование</string>
+    <string name="todo">TODO</string>
+    <string name="menu_main">Главная</string>
+    <string name="menu_profile">Профиль</string>
+    <string name="label_internet_unavailable_heading">Сеть недоступна</string>
+    <string name="label_internet_unavailable_body">Проверьте соединение.\nЭтот экран пропадёт автоматически про появлении доступа к сети.</string>
+    <string name="button_internet_unavailable_manual_check">Проверить вручную</string>
+</resources>

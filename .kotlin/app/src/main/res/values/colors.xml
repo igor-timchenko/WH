@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="red">#F44336</color>
+    <color name="backgroundGray">#F8F8F8</color>
+
+    <color name="disabledButtonColor">#ddddde</color>
+    <color name="disabledButtonTextColor">#949395</color>
+
+
+    <color name="green1">#48FF00</color>
+    <color name="button_primary">#2196F3</color>
+    <color name="background_primary">#F0F0F0</color>
+    <color name="gray1">#D3D3D3</color>
+    <color name="statusBarColor">#CACACA</color>
+    <color name="enabledButtonColor">#505AA4</color>
+    <color name="enabledButtonTextColor">#FFFFFF</color>
+    <color name="hintTextColor">#C4C4C4</color>
+    <color name="textColor">#262626</color>
+    <color name="gray">#B0B0B0</color>
+
+    <color name="transparent">#00000000</color>
+    <color name="bottom_nav_selected">#4C2196F3</color>
+</resources>

@@ -134,15 +134,6 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
     }
 
-    private fun manualInternetCheck() {
-        lifecycleScope.launch(Dispatchers.IO) {
-            val isServiceAvailable = Api.Service.serviceAvailable()
-            launch(Dispatchers.Main) {
-                viewModel.setInternetAvailableState(isServiceAvailable)
-            }
-        }
-    }
-
     companion object {
         const val TAG = "Contlog.MainActivity"
     }
