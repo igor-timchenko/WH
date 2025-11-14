@@ -84,6 +84,8 @@ dependencies {
     implementation(libs.zxing.android.embedded)
     implementation(libs.glide)
     implementation(libs.androidx.ui.test)
+    implementation(libs.play.services.auth)
+    implementation(libs.play.services.auth.api.phone)
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
     testImplementation(libs.junit)

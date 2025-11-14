@@ -1,38 +1,43 @@
-// Обновили
 package ru.contlog.mobile.helper.fragments
 
 // Импорты необходимых классов и библиотек Android и Kotlin
 import android.animation.Animator
-import android.annotation.SuppressLint                    // Для подавления предупреждений компилятора
-import android.content.Context                          // Контекст приложения/активности
-import android.net.ConnectivityManager                  // Системный сервис для проверки подключения к сети
-import android.net.NetworkCapabilities                 // Возможности текущей сети (доступ в интернет и т.д.)
-import android.os.Build                                 // Информация о версии Android
-import android.os.Bundle                                // Контейнер для передачи данных между компонентами
-import android.text.Editable                            // Тип для изменяемого текста (используется в TextWatcher)
+import android.annotation.SuppressLint
+import android.content.Context
+import android.content.IntentFilter
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.os.Build
+import android.os.Bundle
+import android.text.Editable
 import android.util.Log
-import android.view.LayoutInflater                      // Создание View из XML-разметки
-import android.view.View                                // Базовый класс UI-элемента
+import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewAnimationUtils
-import android.view.ViewGroup                           // Контейнер для View
-import android.widget.Toast                             // Всплывающее уведомление
+import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.animation.doOnEnd
 import androidx.core.animation.doOnStart
-import androidx.core.content.ContextCompat             // Безопасное получение ресурсов и цветов
+import androidx.core.content.ContextCompat
 import androidx.core.view.isInvisible
-import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment                   // Базовый класс фрагмента
-import androidx.fragment.app.activityViewModels        // Делегат для получения ViewModel, привязанной к активности
-import androidx.lifecycle.lifecycleScope               // Область корутин, привязанная к жизненному циклу
-import androidx.navigation.fragment.findNavController  // Утилита для навигации между фрагментами
-import com.google.android.material.dialog.MaterialAlertDialogBuilder // Диалоги Material Design
-import kotlinx.coroutines.Dispatchers                   // Диспетчеры корутин (Main, IO и т.д.)
-import kotlinx.coroutines.launch                        // Запуск корутины
-import ru.contlog.mobile.helper.R                       // Сгенерированный класс ресурсов
-import ru.contlog.mobile.helper.databinding.FragmentLoginBinding // ViewBinding для этого фрагмента
-import ru.contlog.mobile.helper.repo.Api                // Объект для выполнения сетевых запросов
-import ru.contlog.mobile.helper.vm.AppViewModel         // Общий ViewModel для хранения состояния приложения
+import androidx.core.view.postDelayed
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import com.google.android.gms.auth.api.phone.SmsRetriever
+import com.google.android.gms.tasks.OnFailureListener
+import com.google.android.gms.tasks.OnSuccessListener
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import ru.contlog.mobile.helper.R
+import ru.contlog.mobile.helper.SMSRetrieverBroadcastReceiver
+import ru.contlog.mobile.helper.databinding.FragmentLoginBinding
+import ru.contlog.mobile.helper.repo.Api
+import ru.contlog.mobile.helper.vm.AppViewModel
 import kotlin.math.hypot
+
 
 // Класс фрагмента экрана авторизации
 class LoginFragment : Fragment() {
@@ -45,6 +50,8 @@ class LoginFragment : Fragment() {
     private val viewModel: AppViewModel by activityViewModels()
     // Флаг для предотвращения повторной отправки SMS при вводе номера
     private var smsRequested = false
+
+    private var smsRetrieverBroadcastReceiver: SMSRetrieverBroadcastReceiver? = null
 
     // Создание корневого представления фрагмента из layout-файла
     override fun onCreateView(
@@ -62,6 +69,26 @@ class LoginFragment : Fragment() {
         bind() // Инициализация слушателей и начального состояния
     }
 
+    override fun onStart() {
+        super.onStart()
+
+        val filter = IntentFilter(SmsRetriever.SMS_RETRIEVED_ACTION)
+        smsRetrieverBroadcastReceiver = SMSRetrieverBroadcastReceiver(::onSmsReceived)
+        ContextCompat.registerReceiver(
+            requireContext(),
+            smsRetrieverBroadcastReceiver,
+            filter,
+            ContextCompat.RECEIVER_EXPORTED
+        )
+    }
+
+    override fun onStop() {
+        smsRetrieverBroadcastReceiver?.let {
+            requireContext().unregisterReceiver(it)
+        }
+        super.onStop()
+    }
+
     // Освобождение ресурсов при уничтожении View для предотвращения утечек
     override fun onDestroyView() {
         super.onDestroyView()
@@ -75,7 +102,7 @@ class LoginFragment : Fragment() {
         binding.TextCodeInput.visibility = View.GONE
         binding.CodeInput.visibility = View.GONE
         binding.CodeSentMessage.visibility = View.GONE
-        // Деактивируем поле ввода кода (нельзя ввести код до получения SMS) //
+        // Деактивируем поле ввода кода (нельзя ввести код до получения SMS)
         binding.CodeInput.isEnabled = false
 
         // Слушатель изменений в поле ввода номера телефона с автоматическим форматированием
@@ -114,6 +141,12 @@ class LoginFragment : Fragment() {
                 revealGetAuthCodeButton(show=isPhoneValid)
 
                 // Если длина номера стала меньше 10 и SMS уже запрашивался — сбрасываем состояние
+                if (clean.length < 10 && smsRequested) {
+                    resetState()
+                }
+                // 🔹 Больше не отключаем поле при вводе 10 цифр — отключаем только после отправки SMS
+                // binding.PhoneInput.isEnabled = !isPhoneValid ← УДАЛЕНО
+
                 if (clean.length < 10 && smsRequested) {
                     resetState()
                 }
@@ -161,6 +194,7 @@ class LoginFragment : Fragment() {
             if (digitsOnly.length == 10 && !smsRequested) {
                 smsRequested = true
                 requestSmsCode(digitsOnly)
+                startSmsRetriever()
             }
         }
     }
@@ -201,6 +235,9 @@ class LoginFragment : Fragment() {
                             ContextCompat.getColor(requireContext(), android.R.color.holo_green_dark)
                         )
                         binding.PhoneSentMessage.visibility = View.VISIBLE
+
+                        // 🔹 Отключаем поле ввода номера после отправки SMS
+                        binding.PhoneInput.isEnabled = false
 
                         // Показываем элементы, связанные с вводом кода
                         binding.TextCodeInput.visibility = View.VISIBLE
@@ -311,6 +348,9 @@ class LoginFragment : Fragment() {
         binding.CodeInput.setText("")
 
         revealGetAuthCodeButton(show=false)
+
+        // 🔹 Возвращаем активность полю при сбросе
+        binding.PhoneInput.isEnabled = true
     }
 
     private var nextViewState: Int? = null
@@ -380,6 +420,45 @@ class LoginFragment : Fragment() {
             // Для старых версий используем устаревший метод (с подавлением предупреждения)
             @Suppress("DEPRECATION")
             connectivityManager.activeNetworkInfo?.isConnected ?: false
+        }
+    }
+
+    private fun startSmsRetriever() {
+        val client = SmsRetriever.getClient(requireContext())
+        val task = client.startSmsRetriever()
+
+        task.addOnSuccessListener {
+            Log.i(TAG, "startSmsRetriever: Удалось подписаться на получение СМС, ждём Broadcast...")
+        }
+
+        task.addOnFailureListener { e ->
+            Log.e(TAG, "startSmsRetriever: Не удалось подписаться на получение СМС", e)
+        }
+    }
+
+    private fun onSmsReceived(sender: String, code: String?) {
+        lifecycleScope.launch(Dispatchers.Main) {
+            /*
+                [#] Ваш код подтверждения:
+                92406
+                /fu6ILbCiG+
+             */
+            val realCode = code?.let {
+                val codePattern = Regex("""\[#]\s*Ваш\s*код\s*подтверждения:\s*\n\s*(\d{5})""", RegexOption.DOT_MATCHES_ALL)
+                codePattern.find(it)?.groupValues?.get(1)
+            }
+
+            if (realCode != null && isAdded && _binding != null) {
+                binding.CodeInput.setText(realCode)
+                binding.CodeInput.setSelection(realCode.length)
+                binding.CodeSentMessage.visibility = View.INVISIBLE
+
+                binding.root.postDelayed({
+                    verifyCode(realCode)
+                }, 10)
+            } else {
+                Log.w(TAG, "Не удалось извлечь код или фрагмент еще не готов. Код был: $code")
+            }
         }
     }
 
