@@ -102,6 +102,7 @@ class LoginFragment : Fragment() {
         binding.TextCodeInput.visibility = View.GONE
         binding.CodeInput.visibility = View.GONE
         binding.CodeSentMessage.visibility = View.GONE
+        binding.getAuthCode.visibility = View.GONE
         // Деактивируем поле ввода кода (нельзя ввести код до получения SMS)
         binding.CodeInput.isEnabled = false
 
@@ -188,12 +189,23 @@ class LoginFragment : Fragment() {
             binding.appVersionText.text = "Версия: неизвестна"
         }
 
+        // Установка слушателя кликов (OnClickListener) на элемент интерфейса с ID 'getAuthCode' (кнопка "Получить код")
         binding.getAuthCode.setOnClickListener {
+            // Получение текста из поля ввода номера телефона (binding.PhoneInput)
+            // Преобразование его в строку (.toString())
+            // Удаление всех символов, которые не являются цифрами (\D - любые не-цифры), с помощью регулярного выражения
             val digitsOnly = binding.PhoneInput.text.toString().replace(Regex("\\D"), "")
 
+            // Проверка двух условий:
+            // 1. Длина строки из цифр (digitsOnly) равна 10 (валидный номер)
+            // 2. Флаг smsRequested равен false (SMS еще не запрашивался для текущего номера)
             if (digitsOnly.length == 10 && !smsRequested) {
+                // Установка флага smsRequested в true, чтобы предотвратить повторную отправку SMS
+                // при повторном нажатии кнопки до завершения текущего цикла (ввода кода и проверки)
                 smsRequested = true
+                // Вызов метода requestSmsCode, передав ему строку из 10 цифр (номер телефона без форматирования)
                 requestSmsCode(digitsOnly)
+                // Вызов метода startSmsRetriever для инициализации прослушивания SMS-сообщений
                 startSmsRetriever()
             }
         }
