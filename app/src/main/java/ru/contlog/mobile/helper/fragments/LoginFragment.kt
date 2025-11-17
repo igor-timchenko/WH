@@ -261,6 +261,7 @@ class LoginFragment : Fragment() {
                         binding.CodeInput.isEnabled = true
                         binding.CodeInput.setText("")
                         binding.CodeInput.requestFocus()
+                        binding.getAuthCode.visibility = View.GONE
 
                         // Показываем подсказку через 1 секунду, если поле осталось пустым
                         binding.CodeInput.postDelayed({
@@ -457,8 +458,12 @@ class LoginFragment : Fragment() {
                 /fu6ILbCiG+
              */
             val realCode = code?.let {
-                val codePattern = Regex("""\[#]\s*Ваш\s*код\s*подтверждения:\s*\n\s*(\d{5})""", RegexOption.DOT_MATCHES_ALL)
-                codePattern.find(it)?.groupValues?.get(1)
+                try {
+                    val codePattern = Regex("""\[#\].+Ваш.+код.+подтверждения:.+\n.+(\d{5})""")
+                    codePattern.find(it)?.groupValues?.get(1)
+                } catch (e: Exception) {
+                    null
+                }
             }
 
             if (realCode != null && isAdded && _binding != null) {

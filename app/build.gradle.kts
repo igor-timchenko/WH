@@ -1,8 +1,3 @@
-@file:Suppress("DEPRECATION")
-
-import io.grpc.internal.SharedResourceHolder.release
-import io.netty.util.ReferenceCountUtil.release
-
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -15,7 +10,7 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = file("D:/File SSD C=D/Документы/Supplier_CONTINENT/Keys/SUPPLIER_CONTINENT1.jks")
+            storeFile = file("D:/File SSD C=D/Документы/Supplier_CONTINENT/Keys/SUPPLIER_CONTINENT2.jks")
             storePassword = "123456"
             keyAlias = "mykey"
             keyPassword = "123456"
@@ -24,6 +19,9 @@ android {
 
     buildTypes {
         getByName("release") {
+            signingConfig = signingConfigs.getByName("release")
+        }
+        getByName("debug") {
             signingConfig = signingConfigs.getByName("release")
         }
     }
@@ -62,11 +60,6 @@ android {
 }
 
 dependencies {
-
-    //noinspection UseTomlInstead  -  не проводите инспекцию, используя Tomlinstead // Обновили1
-    implementation("com.google.android.gms:play-services-auth:21.4.0")
-    implementation("com.google.android.gms:play-services-auth-api-phone:18.3.0")
-    implementation("androidx.localbroadcastmanager:localbroadcastmanager:1.1.0")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

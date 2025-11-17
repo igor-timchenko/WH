@@ -2,22 +2,30 @@
 package ru.contlog.mobile.helper
 
 // Импорт необходимых классов и библиотек Android и Google Play Services
-import android.content.BroadcastReceiver            // Базовый класс для получения broadcast-сообщений
-import android.content.Context                      // Контекст приложения
-import android.content.Intent                       // Объект, содержащий информацию о намерении
-import android.util.Log                     // Класс для вывода логов
-import com.google.android.gms.auth.api.phone.SmsRetriever           // Класс для работы с SMS Retriever API
-import com.google.android.gms.common.api.CommonStatusCodes          // Класс с общими кодами статусов Google API
-import com.google.android.gms.common.api.Status             // Класс для представления статуса Google API
+import android.content.BroadcastReceiver            /** Базовый класс для получения broadcast-сообщений */
+import android.content.Context                      /** Контекст приложения */
+import android.content.Intent                       /** Объект, содержащий информацию о намерении */
+import android.util.Log                     /** Класс для вывода логов */
+import com.google.android.gms.auth.api.phone.SmsRetriever           /** Класс для работы с SMS Retriever API */
+import com.google.android.gms.common.api.CommonStatusCodes          /** Класс с общими кодами статусов Google API */
+import com.google.android.gms.common.api.Status             /** Класс для представления статуса Google API */
 
-// Объявление класса SMSRetrieverBroadcastReceiver, наследующего от BroadcastReceiver
-// Конструктор принимает лямбду onSmsReceived, которая будет вызвана при получении SMS
+/**
+ * Объявление класса SMSRetrieverBroadcastReceiver, наследующего от BroadcastReceiver
+ * Конструктор принимает лямбду onSmsReceived, которая будет вызвана при получении SMS
+ */
 class SMSRetrieverBroadcastReceiver(private val onSmsReceived: (String, String?) -> Unit) : BroadcastReceiver() {
 
-    // Переопределение метода onReceive, который вызывается системой при получении broadcast-сообщения
+    /**
+     * Переопределение метода onReceive, который вызывается системой
+     * при получении broadcast-сообщения
+     */
     override fun onReceive(context: Context?, intent: Intent?) {
 
-        // Проверка, не равен ли пришедший Intent null
+        /**
+         *  Проверка, не равен
+         *  ли пришедший Intent null
+         */
         if (intent == null) {
 
             // Если Intent null, логируем ошибку и выходим из метода
