@@ -90,7 +90,6 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
             android:text="@string/label_internet_unavailable_body"
-            app:layout_constraintBottom_toTopOf="@+id/manualInternetCheck"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
