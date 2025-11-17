@@ -2,14 +2,14 @@ package ru.contlog.mobile.helper
 
 // Импорты системных и вспомогательных классов Android
 import android.content.Context
-import android.net.ConnectivityManager
-import android.net.Network
-import android.net.NetworkCapabilities
-import android.net.NetworkRequest
+import android.net.ConnectivityManager // Импорт класса ConnectivityManager из пакета android.net. ConnectivityManager - это системный сервис Android, который предоставляет информацию о состоянии подключения к сети (Wi-Fi, мобильный интернет и т.д.) и управляет этими подключениями.
+import android.net.Network          // Импорт класса Network из пакета android.net. Network представляет собой конкретное сетевое подключение на устройстве. Он используется, например, в колбэках ConnectivityManager.NetworkCallback для получения информации о конкретной сети, которая изменила состояние.
+import android.net.NetworkCapabilities  // Импорт класса NetworkCapabilities из пакета android.net. NetworkCapabilities содержит информацию о возможностях (capabilities) и свойствах конкретного сетевого подключения (Network). Позволяет проверить, например, поддерживает ли сеть интернет (NET_CAPABILITY_INTERNET) или является VPN (NET_CAPABILITY_VPN).
+import android.net.NetworkRequest // Импорт класса NetworkRequest из пакета android.net. NetworkRequest используется для описания требований к сетевому подключению, которое нужно отслеживать или запрашивать. Создается с помощью NetworkRequest.Builder. Например, можно запросить подключение, которое поддерживает интернет и использует Wi-Fi.
 import android.os.Build                    // Для проверки версии Android API
 import android.os.Bundle                     // Для работы с состоянием активности
 import android.telecom.ConnectionService
-import android.util.Log
+import android.util.Log     // Импорт класса Log из пакета android.util. Класс Log используется для вывода сообщений в лог-систему Android. Это полезно для отладки приложений, отслеживания ошибок и получения информации о выполнении кода. Сообщения могут быть разного уровня (verbose, debug, info, warn, error).
 import android.view.View                     // Базовый класс UI-элемента
 import android.view.WindowInsets             // Для работы с системными вставками (status bar, navigation bar)
 // Включает edge-to-edge режим (полноэкранный интерфейс)

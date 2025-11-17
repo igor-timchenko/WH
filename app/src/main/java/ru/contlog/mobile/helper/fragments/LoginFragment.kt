@@ -1,42 +1,42 @@
 package ru.contlog.mobile.helper.fragments
 
 // Импорты необходимых классов и библиотек Android и Kotlin
-import android.animation.Animator
-import android.annotation.SuppressLint
-import android.content.Context
-import android.content.IntentFilter
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
-import android.os.Build
-import android.os.Bundle
-import android.text.Editable
-import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewAnimationUtils
-import android.view.ViewGroup
-import android.widget.Toast
-import androidx.core.animation.doOnEnd
-import androidx.core.animation.doOnStart
-import androidx.core.content.ContextCompat
-import androidx.core.view.isInvisible
-import androidx.core.view.postDelayed
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
-import com.google.android.gms.auth.api.phone.SmsRetriever
-import com.google.android.gms.tasks.OnFailureListener
-import com.google.android.gms.tasks.OnSuccessListener
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import ru.contlog.mobile.helper.R
-import ru.contlog.mobile.helper.SMSRetrieverBroadcastReceiver
-import ru.contlog.mobile.helper.databinding.FragmentLoginBinding
-import ru.contlog.mobile.helper.repo.Api
-import ru.contlog.mobile.helper.vm.AppViewModel
-import kotlin.math.hypot
+import android.animation.Animator               // Импорт необходимого класса для анимации (ViewAnimationUtils)
+import android.annotation.SuppressLint          // Импорт аннотации для подавления предупреждений компилятора Android
+import android.content.Context                  // Импорт класса Context для доступа к ресурсам и сервисам приложения
+import android.content.IntentFilter         // Импорт класса IntentFilter для фильтрации Broadcast-сообщений
+import android.net.ConnectivityManager          // Импорт класса ConnectivityManager для проверки состояния подключения к сети
+import android.net.NetworkCapabilities      // Импорт класса NetworkCapabilities для определения возможностей сети
+import android.os.Build         // Импорт класса Build для получения информации о версии Android
+import android.os.Bundle                // Импорт класса Bundle для передачи данных между компонентами Android
+import android.text.Editable        // Импорт интерфейса Editable для работы с редактируемым текстом
+import android.util.Log         // Импорт класса Log для вывода логов
+import android.view.LayoutInflater          // Импорт класса LayoutInflater для инфляции (создания) View из XML
+import android.view.View            // Импорт базового класса View для элементов пользовательского интерфейса
+import android.view.ViewAnimationUtils          // Импорт класса ViewAnimationUtils для создания анимаций (например, кругового развертывания)
+import android.view.ViewGroup           // Импорт класса ViewGroup для контейнеров View
+import android.widget.Toast         // Импорт класса Toast для показа коротких всплывающих сообщений
+import androidx.core.animation.doOnEnd              // Импорт расширения для корутин (doOnEnd) из библиотеки androidx.core
+import androidx.core.animation.doOnStart       // Импорт расширения для корутин (doOnStart) из библиотеки androidx.core
+import androidx.core.content.ContextCompat       // Импорт класса ContextCompat для безопасного получения ресурсов и цветов
+import androidx.core.view.isInvisible   // Импорт расширения для проверки видимости (isInvisible) из библиотеки androidx.core
+import androidx.core.view.postDelayed       // Импорт расширения для задержки (postDelayed) из библиотеки androidx.core
+import androidx.fragment.app.Fragment     // Импорт базового класса Fragment для создания фрагментов
+import androidx.fragment.app.activityViewModels     // Импорт делегата для получения ViewModel, привязанной к активности
+import androidx.lifecycle.lifecycleScope    // Импорт области видимости жизненного цикла для корутин
+import androidx.navigation.fragment.findNavController       // Импорт утилиты для навигации между фрагментами
+import com.google.android.gms.auth.api.phone.SmsRetriever       // Импорт класса SmsRetriever из Google Play Services для получения SMS
+import com.google.android.gms.tasks.OnFailureListener   // Импорт интерфейса OnFailureListener для обработки неудачных задач Google API
+import com.google.android.gms.tasks.OnSuccessListener       // Импорт интерфейса OnSuccessListener для обработки успешных задач Google API
+import com.google.android.material.dialog.MaterialAlertDialogBuilder   // Импорт билдера для создания Material Design диалогов
+import kotlinx.coroutines.Dispatchers       // Импорт диспетчеров корутин (Dispatchers)
+import kotlinx.coroutines.launch        // Импорт функции launch для запуска корутин
+import ru.contlog.mobile.helper.R   // Импорт сгенерированного класса R для доступа к ресурсам приложения
+import ru.contlog.mobile.helper.SMSRetrieverBroadcastReceiver       // Импорт класса SMSRetrieverBroadcastReceiver, определенного в вашем проекте
+import ru.contlog.mobile.helper.databinding.FragmentLoginBinding        // Импорт ViewBinding для безопасного доступа к View
+import ru.contlog.mobile.helper.repo.Api    // Импорт класса Api, определенного в вашем проекте для сетевых запросов
+import ru.contlog.mobile.helper.vm.AppViewModel         // Импорт класса AppViewModel, определенного в вашем проекте
+import kotlin.math.hypot        // Импорт функции hypot из библиотеки
 
 
 // Класс фрагмента экрана авторизации
@@ -139,7 +139,9 @@ class LoginFragment : Fragment() {
                 // Активируем поле ввода кода только при валидном номере
                 binding.CodeInput.isEnabled = isPhoneValid
 
-                revealGetAuthCodeButton(show=isPhoneValid)
+                // --- Изменение: Кнопка отображается ТОЛЬКО если номер валидный И SMS НЕ запрашивался ---
+                revealGetAuthCodeButton(show = isPhoneValid && !smsRequested)
+                // --- Изменение ---
 
                 // Если длина номера стала меньше 10 и SMS уже запрашивался — сбрасываем состояние
                 if (clean.length < 10 && smsRequested) {
@@ -195,7 +197,6 @@ class LoginFragment : Fragment() {
             // Преобразование его в строку (.toString())
             // Удаление всех символов, которые не являются цифрами (\D - любые не-цифры), с помощью регулярного выражения
             val digitsOnly = binding.PhoneInput.text.toString().replace(Regex("\\D"), "")
-
             // Проверка двух условий:
             // 1. Длина строки из цифр (digitsOnly) равна 10 (валидный номер)
             // 2. Флаг smsRequested равен false (SMS еще не запрашивался для текущего номера)
