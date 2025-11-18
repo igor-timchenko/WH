@@ -461,7 +461,7 @@ class LoginFragment : Fragment() {
 
             val realCode = code?.let {
                 try {
-                    val codePattern = Regex("""\[#]\s*Ваш\s*код\s*подтверждения:\s+(\d{5})""", RegexOption.DOT_MATCHES_ALL)
+                    val codePattern = Regex("\\b(\\d{5})\\b")
                     val matchResult = codePattern.find(it)
                     Log.d(TAG, "Результат поиска по регулярному выражению: $matchResult") // <-- Добавьте это
                     matchResult?.groupValues?.get(1)
