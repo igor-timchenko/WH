@@ -71,6 +71,7 @@ class LoginFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
+        Log.d(TAG, "LoginFragment onStart - Регистрация BroadcastReceiver")
 
         val filter = IntentFilter(SmsRetriever.SMS_RETRIEVED_ACTION)
         smsRetrieverBroadcastReceiver = SMSRetrieverBroadcastReceiver(::onSmsReceived)
@@ -80,11 +81,14 @@ class LoginFragment : Fragment() {
             filter,
             ContextCompat.RECEIVER_EXPORTED
         )
+        Log.d(TAG, "SMSRetrieverBroadcastReceiver зарегистрирован")
     }
 
     override fun onStop() {
+        Log.d(TAG, "LoginFragment onStop - Отмена регистрации BroadcastReceiver")
         smsRetrieverBroadcastReceiver?.let {
             requireContext().unregisterReceiver(it)
+            Log.d(TAG, "SMSRetrieverBroadcastReceiver отменена регистрация")
         }
         super.onStop()
     }
@@ -438,6 +442,7 @@ class LoginFragment : Fragment() {
     }
 
     private fun startSmsRetriever() {
+        Log.d(TAG, "Вызов startSmsRetriever")
         val client = SmsRetriever.getClient(requireContext())
         val task = client.startSmsRetriever()
 
@@ -452,19 +457,21 @@ class LoginFragment : Fragment() {
 
     private fun onSmsReceived(sender: String, code: String?) {
         lifecycleScope.launch(Dispatchers.Main) {
-            /*
-                [#] Ваш код подтверждения:
-                92406
-                /fu6ILbCiG+
-             */
+            Log.d(TAG, "Получено SMS: '$code'") // <-- Добавьте это
+
             val realCode = code?.let {
                 try {
-                    val codePattern = Regex("""\[#\].+Ваш.+код.+подтверждения:.+\n.+(\d{5})""")
-                    codePattern.find(it)?.groupValues?.get(1)
+                    val codePattern = Regex("""\[#]\s*Ваш\s*код\s*подтверждения:\s+(\d{5})""", RegexOption.DOT_MATCHES_ALL)
+                    val matchResult = codePattern.find(it)
+                    Log.d(TAG, "Результат поиска по регулярному выражению: $matchResult") // <-- Добавьте это
+                    matchResult?.groupValues?.get(1)
                 } catch (e: Exception) {
+                    Log.e(TAG, "Ошибка в регулярном выражении", e) // <-- Добавьте это
                     null
                 }
             }
+
+            Log.d(TAG, "Извлеченный код: $realCode") // <-- Добавьте это
 
             if (realCode != null && isAdded && _binding != null) {
                 binding.CodeInput.setText(realCode)
@@ -479,7 +486,6 @@ class LoginFragment : Fragment() {
             }
         }
     }
-
     companion object {
         const val TAG = "Contlog.LoginFragment"
     }
