@@ -6,6 +6,7 @@ import okhttp3.FormBody
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import ru.contlog.mobile.helper.BuildConfig
 import ru.contlog.mobile.helper.exceptions.ApiRequestException
 import ru.contlog.mobile.helper.model.AuthGetSmsResponse
 import ru.contlog.mobile.helper.model.AuthCheckSmsParams
@@ -19,8 +20,7 @@ import ru.contlog.mobile.helper.utils.await
 object Api {
     const val TAG = "Contlog.Api"
 
-    const val API_DOMAIN = "89.189.173.36:800"
-    const val API_ENDPOINT = "http://$API_DOMAIN"
+    const val API_ENDPOINT = BuildConfig.API_HOST
 
     private val client = OkHttpClient()
 

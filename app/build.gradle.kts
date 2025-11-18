@@ -17,15 +17,6 @@ android {
         }
     }
 
-    buildTypes {
-        getByName("release") {
-            signingConfig = signingConfigs.getByName("release")
-        }
-        getByName("debug") {
-            signingConfig = signingConfigs.getByName("release")
-        }
-    }
-
     defaultConfig {
         applicationId = "ru.contlog.mobile.helper"
         minSdk = 29
@@ -38,13 +29,26 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            // Enables code-related app optimization.
+            isMinifyEnabled = true
+
+            // Enables resource shrinking.
+//            isShrinkResources = true
+
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+//            signingConfig = signingConfigs.getByName("release")
+
+            buildConfigField("String", "API_HOST", "\"https://pyapi.contlog.ru\"")
+        }
+
+        debug {
+            buildConfigField("String", "API_HOST", "\"http://local.netcraze.pro:800\"")
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -56,6 +60,12 @@ android {
     buildFeatures {
         buildConfig = true
         viewBinding = true
+    }
+
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
     }
 }
 

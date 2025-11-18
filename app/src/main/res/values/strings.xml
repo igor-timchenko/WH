@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Поставщик КОНТИНЕНТ PRO</string>
+    <string name="app_name">КОНТИНЕНТ.PRO</string>
     <string name="phoneHint">\u00A0(983)\u00A0255-25-25</string>
     <string name="codeHint">00000</string>
     <string name="buttonGetCode">Код</string>
