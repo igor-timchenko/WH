@@ -470,7 +470,6 @@ class LoginFragment : Fragment() {
                     null
                 }
             }
-
             Log.d(TAG, "Извлеченный код: $realCode") // <-- Добавьте это
 
             if (realCode != null && isAdded && _binding != null) {
