@@ -51,6 +51,17 @@ class ProductInfoViewModel() : ViewModel() {
         _products.value = products
     }
 
+    // Внутреннее изменяемое состояние для хранения ошибок
+    private val _errors: MutableLiveData<MutableList<Throwable>> by lazy {
+        MutableLiveData(mutableListOf())
+    }
+    // Публичный LiveData для наблюдения за ошибками
+    val errors: LiveData<MutableList<Throwable>> = _errors
+    // Метод для очистки ошибок
+    fun clearErrors() {
+        _errors.value = mutableListOf()
+    }
+
     // Suspend-функция для загрузки данных о продукте по отсканированному коду
     suspend fun fetchUserData(apiAuthData: ApiAuthData, scannedCode: String) {
         // Получаем текущее подразделение из LiveData (гарантированно не null благодаря !!)
@@ -75,7 +86,12 @@ class ProductInfoViewModel() : ViewModel() {
             { error ->
                 // Обрабатываем ошибку на главном потоке
                 viewModelScope.launch(Dispatchers.Main) {
-                    // TODO: implement — заглушка для обработки ошибки (например, показ Snackbar)
+                    // Сохраняем ошибку в LiveData для отображения пользователю
+                    val currentErrors = _errors.value ?: mutableListOf()
+                    currentErrors.add(error)
+                    _errors.value = currentErrors
+                    // Устанавливаем пустой список продуктов при ошибке
+                    setProducts(emptyList())
                 }
             }
         )

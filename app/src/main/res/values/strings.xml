@@ -42,4 +42,6 @@
     <string name="label_internet_unavailable_heading">Сеть недоступна</string>
     <string name="label_internet_unavailable_body">Проверьте соединение.\nЭтот экран пропадёт автоматически про появлении доступа к сети.</string>
     <string name="button_internet_unavailable_manual_check">Проверить вручную</string>
+    <string name="label_processing_barcode">Обработка штрихкода…</string>
+    <string name="label_loading_data">Получение данных…</string>
 </resources>

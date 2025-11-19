@@ -21,9 +21,11 @@ import com.journeyapps.barcodescanner.ScanIntentResult // Результат с�
 import com.journeyapps.barcodescanner.ScanOptions // Настройки сканера
 import kotlinx.coroutines.Dispatchers        // Диспетчеры корутин (IO, Main и т.д.)
 import kotlinx.coroutines.launch            // Запуск корутины
+import kotlinx.coroutines.withContext      // Переключение контекста корутины
 import kotlinx.datetime.LocalDateTime       // Модель даты и времени (kotlinx-datetime)
 import ru.contlog.mobile.helper.R           // Сгенерированный класс ресурсов
 import ru.contlog.mobile.helper.databinding.FragmentProductInfoBinding // ViewBinding для этого фрагмента
+import ru.contlog.mobile.helper.exceptions.ApiRequestException // Исключения API
 import ru.contlog.mobile.helper.model.Division // Модель подразделения
 import ru.contlog.mobile.helper.model.Product // Модель продукта
 import ru.contlog.mobile.helper.model.ProductPlace // Модель места продукта
@@ -38,6 +40,18 @@ import ru.contlog.mobile.helper.vm.factories.AppViewModelFactory // Фабрик
 class ProductInfoFragment : Fragment() {
     // ViewBinding для безопасного доступа к UI-элементам
     private lateinit var binding: FragmentProductInfoBinding
+    
+    // Флаг для отслеживания первой загрузки данных
+    private var isFirstLoad = true
+    
+    // Аниматор для пульсации индикатора загрузки
+    private var loadingIndicatorAnimator: android.animation.Animator? = null
+    
+    // Константы для анимации
+    private companion object {
+        const val ANIMATION_DURATION = 300L // Длительность анимации в миллисекундах
+        const val PULSE_DURATION = 1000L // Длительность пульсации в миллисекундах
+    }
 
     // Основной ViewModel с данными авторизации (получается через фабрику с репозиторием)
     private val viewModel: AppViewModel by viewModels {
@@ -83,6 +97,7 @@ class ProductInfoFragment : Fragment() {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 requireArguments().getSerializable("division", Division::class.java)
             } else {
+                @Suppress("DEPRECATION")
                 requireArguments().getSerializable("division") as Division
             }!!
         )
@@ -113,6 +128,26 @@ class ProductInfoFragment : Fragment() {
             (binding.productsList.layoutManager as CustomLinearLayoutManager).isScrollEnabled = enable
         }
 
+        // Подписываемся на ошибки из ViewModel
+        productViewModel.errors.observe(viewLifecycleOwner) { errors ->
+            if (errors.isNotEmpty()) {
+                // Получаем последнюю ошибку
+                val lastError = errors.last()
+                // Формируем сообщение для пользователя
+                val errorMessage = if (lastError is ApiRequestException) {
+                    lastError.humanMessage
+                } else {
+                    "Ошибка при получении данных. Проверьте подключение к интернету."
+                }
+                // Показываем сообщение об ошибке пользователю
+                Toast.makeText(
+                    requireContext(),
+                    errorMessage,
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
+
         // Подписываемся на изменения списка продуктов в ViewModel
         productViewModel.products.observe(viewLifecycleOwner) { products ->
             // Если данных ещё нет — показываем пустой список
@@ -128,6 +163,11 @@ class ProductInfoFragment : Fragment() {
                 View.VISIBLE
             } else {
                 View.GONE
+            }
+            // Анимация появления списка продуктов после первой загрузки
+            if (products.isNotEmpty() && isFirstLoad) {
+                animateProductsListAppearance()
+                isFirstLoad = false
             }
         }
 
@@ -161,19 +201,142 @@ class ProductInfoFragment : Fragment() {
 
     // Метод загрузки данных по отсканированному коду
     private fun loadData(code: String) {
-        // Сбрасываем предыдущие данные
+        // Сбрасываем предыдущие данные и флаг первой загрузки для новой анимации
         productViewModel.setProducts(null)
-        // Показываем индикатор загрузки
-        binding.progress.visibility = View.VISIBLE
+        // Очищаем предыдущие ошибки перед новой загрузкой
+        productViewModel.clearErrors()
+        isFirstLoad = true
+        // Показываем overlay загрузки с анимацией
+        showLoadingOverlay()
         // Запускаем загрузку в фоновом потоке
         lifecycleScope.launch(Dispatchers.IO) {
-            // Выполняем сетевой запрос с авторизационными данными и кодом
-            productViewModel.fetchUserData(viewModel.apiAuthData!!, code)
-            // Скрываем индикатор загрузки на главном потоке
-            launch(Dispatchers.Main) {
-                binding.progress.visibility = View.INVISIBLE
+            try {
+                // Выполняем сетевой запрос с авторизационными данными и кодом
+                productViewModel.fetchUserData(viewModel.apiAuthData!!, code)
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                // Обрабатываем отмену корутины (например, при уничтожении фрагмента)
+                Log.d("ProductInfoFragment", "Загрузка данных отменена")
+                // Гарантируем закрытие overlay даже при отмене
+                withContext(Dispatchers.Main) {
+                    hideLoadingOverlay()
+                }
+                throw e // Пробрасываем исключение отмены дальше
+            } catch (e: Exception) {
+                // Логируем неожиданную ошибку для отладки
+                Log.e("ProductInfoFragment", "Неожиданная ошибка при загрузке данных: ${e.message}", e)
+                // Устанавливаем пустой список продуктов при ошибке
+                productViewModel.setProducts(emptyList())
+            } finally {
+                // Гарантируем закрытие overlay загрузки в любом случае (успех или ошибка)
+                // Это предотвращает блокировку экрана при любых ошибках
+                // Используем withContext вместо launch для гарантированного выполнения
+                withContext(Dispatchers.Main) {
+                    if (binding.loadingOverlay.visibility == View.VISIBLE) {
+                        hideLoadingOverlay()
+                    }
+                }
             }
         }
+    }
+    
+    // Метод показа overlay загрузки с анимацией появления
+    private fun showLoadingOverlay() {
+        // Устанавливаем текст загрузки
+        binding.loadingText.text = getString(R.string.label_processing_barcode)
+        // Начинаем с прозрачного состояния
+        binding.loadingOverlay.alpha = 0f
+        binding.loadingOverlay.visibility = View.VISIBLE
+        // Анимация появления overlay с затемнением
+        binding.loadingOverlay.animate()
+            .alpha(1f)
+            .setDuration(ANIMATION_DURATION)
+            .setListener(null)
+        // Анимация пульсации индикатора загрузки
+        animateLoadingIndicator()
+    }
+    
+    // Метод скрытия overlay загрузки с анимацией исчезновения
+    private fun hideLoadingOverlay() {
+        // Останавливаем анимацию пульсации
+        loadingIndicatorAnimator?.cancel()
+        loadingIndicatorAnimator = null
+        // Сбрасываем масштаб индикатора
+        binding.loadingProgressIndicator.scaleX = 1f
+        binding.loadingProgressIndicator.scaleY = 1f
+        // Анимация исчезновения overlay
+        binding.loadingOverlay.animate()
+            .alpha(0f)
+            .setDuration(ANIMATION_DURATION)
+            .setListener(object : android.animation.AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: android.animation.Animator) {
+                    binding.loadingOverlay.visibility = View.GONE
+                }
+            })
+    }
+    
+    // Метод анимации пульсации индикатора загрузки
+    private fun animateLoadingIndicator() {
+        // Останавливаем предыдущую анимацию, если она есть
+        loadingIndicatorAnimator?.cancel()
+        // Создаем новую анимацию пульсации
+        val scaleUpX = android.animation.ObjectAnimator.ofFloat(
+            binding.loadingProgressIndicator,
+            "scaleX",
+            1f, 1.15f
+        ).apply {
+            duration = PULSE_DURATION / 2
+        }
+        val scaleUpY = android.animation.ObjectAnimator.ofFloat(
+            binding.loadingProgressIndicator,
+            "scaleY",
+            1f, 1.15f
+        ).apply {
+            duration = PULSE_DURATION / 2
+        }
+        val scaleDownX = android.animation.ObjectAnimator.ofFloat(
+            binding.loadingProgressIndicator,
+            "scaleX",
+            1.15f, 1f
+        ).apply {
+            duration = PULSE_DURATION / 2
+        }
+        val scaleDownY = android.animation.ObjectAnimator.ofFloat(
+            binding.loadingProgressIndicator,
+            "scaleY",
+            1.15f, 1f
+        ).apply {
+            duration = PULSE_DURATION / 2
+        }
+        
+        val scaleUpSet = android.animation.AnimatorSet().apply {
+            playTogether(scaleUpX, scaleUpY)
+        }
+        val scaleDownSet = android.animation.AnimatorSet().apply {
+            playTogether(scaleDownX, scaleDownY)
+        }
+        
+        val animatorSet = android.animation.AnimatorSet().apply {
+            playSequentially(scaleUpSet, scaleDownSet)
+            addListener(object : android.animation.AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: android.animation.Animator) {
+                    // Повторяем анимацию, если overlay все еще виден
+                    if (binding.loadingOverlay.visibility == View.VISIBLE) {
+                        animateLoadingIndicator()
+                    }
+                }
+            })
+        }
+        loadingIndicatorAnimator = animatorSet
+        animatorSet.start()
+    }
+    
+    // Метод анимации появления списка продуктов
+    private fun animateProductsListAppearance() {
+        binding.productsList.alpha = 0f
+        binding.productsList.animate()
+            .alpha(1f)
+            .setDuration(ANIMATION_DURATION)
+            .setListener(null)
     }
 
     // Метод генерации мок-данных для тестирования без сканирования
@@ -210,6 +373,19 @@ class ProductInfoFragment : Fragment() {
         } else {
             @Suppress("DEPRECATION")
             connectivityManager.activeNetworkInfo?.isConnected == true
+        }
+    }
+    
+    // Освобождение ресурсов при уничтожении View для предотвращения утечек
+    override fun onDestroyView() {
+        super.onDestroyView()
+        // Останавливаем анимацию загрузки при уничтожении View
+        loadingIndicatorAnimator?.cancel()
+        loadingIndicatorAnimator = null
+        // Гарантируем закрытие overlay загрузки при уничтожении View
+        // Это предотвращает блокировку экрана, если фрагмент был уничтожен во время загрузки
+        if (::binding.isInitialized && binding.loadingOverlay.visibility == View.VISIBLE) {
+            hideLoadingOverlay()
         }
     }
 }

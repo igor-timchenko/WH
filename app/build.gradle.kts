@@ -42,6 +42,7 @@ android {
 //            signingConfig = signingConfigs.getByName("release")
 
             buildConfigField("String", "API_HOST", "\"https://pyapi.contlog.ru\"")
+            signingConfig = signingConfigs.getByName("release")
         }
 
         debug {

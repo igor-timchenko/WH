@@ -1,6 +1,6 @@
 [versions]
 #noinspection AndroidGradlePluginVersion
-agp = "8.12.3"
+agp = "8.13.1"
 #noinspection NewerVersionAvailable
 kotlin = "2.2.21"
 coreKtx = "1.17.0"
@@ -16,7 +16,7 @@ cardview = "1.0.0"
 swiperefreshlayout = "1.2.0-alpha01"
 fragment = "1.8.9"
 #noinspection GradleDependency
-navigation = "2.9.5"
+navigation = "2.9.6"
 kotlinxSerializationJson = "1.9.0"
 kotlinxDatetime = "0.7.1"
 #noinspection NewerVersionAvailable

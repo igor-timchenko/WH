@@ -199,7 +199,7 @@ object Api {
                     "Не удалось получить данные пользователя: произошла ошибка при чтении ответа от сервера"
                 ))
             } catch (e: Exception) {
-                Log.e(TAG, "checkSms: Error sending request", e)
+                Log.e(TAG, "getUserData: Error sending request", e)
 
                 return Result.failure(ApiRequestException(
                     "getUserData",
@@ -252,7 +252,7 @@ object Api {
                     "Не удалось получить список площадок: произошла ошибка при чтении ответа от сервера"
                 ))
             } catch (e: Exception) {
-                Log.e(TAG, "checkSms: Error sending request", e)
+                Log.e(TAG, "getDivisions: Error sending request", e)
 
                 return Result.failure(ApiRequestException(
                     "getDivisions",
@@ -289,7 +289,7 @@ object Api {
 
                         if (data.error) {
                             return Result.failure(ApiRequestException(
-                                "getDivisions",
+                                "getProductInfo",
                                 "Запрос вернул ошибку: ${response.message}",
                                 "Не удалось получить информацию о продукте: произошла ошибка при чтении ответа от сервера"
                             ))
@@ -297,7 +297,7 @@ object Api {
 
                         if (data.data == null) {
                             return Result.failure(ApiRequestException(
-                                "getDivisions",
+                                "getProductInfo",
                                 "Сервер вернул пустой ответ: ${response.message}",
                                 "Не удалось получить информацию о продукте: произошла ошибка при чтении ответа от сервера"
                             ))
@@ -307,15 +307,15 @@ object Api {
                     }
 
                     return Result.failure(ApiRequestException(
-                        "getDivisions",
+                        "getProductInfo",
                         "Запрос вернул ошибку: ${response.message}",
                         "Не удалось получить информацию о продукте: произошла ошибка при чтении ответа от сервера"
                     ))
                 } catch (e: Exception) {
-                    Log.e(TAG, "checkSms: Error sending request", e)
+                    Log.e(TAG, "getProductInfo: Error sending request", e)
 
                     return Result.failure(ApiRequestException(
-                        "getDivisions",
+                        "getProductInfo",
                         "Ошибка во время выполнения запроса: ${e.message ?: "неизвестная ошибка"}",
                         "Не удалось получить информацию о продукте"
                     ))

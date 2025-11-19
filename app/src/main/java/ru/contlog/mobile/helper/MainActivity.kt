@@ -23,6 +23,7 @@ import androidx.core.content.getSystemService
 import androidx.lifecycle.lifecycleScope
 // Утилиты для навигации между фрагментами
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.findNavController
 // Корутины
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -107,53 +108,55 @@ class MainActivity : AppCompatActivity() {
             binding.root.fitsSystemWindows = true
         }
 
-        // Получаем NavHostFragment из контейнера по ID
-        val navHostFragment = supportFragmentManager.findFragmentById(binding.fragmentContainerView.id) as NavHostFragment
-        // Получаем NavController для управления навигацией
-        val navController = navHostFragment.navController
+        // Откладываем получение NavController до полной инициализации FragmentContainerView
+        // Это предотвращает ошибку инициализации FragmentContainerView
+        binding.fragmentContainerView.post {
+            // Получаем NavController через extension функцию на View
+            val navController = binding.fragmentContainerView.findNavController()
 
-        // Если пользователь уже авторизован (apiAuthData не null) — перенаправляем на экран рабочих площадок
-        if (viewModel.apiAuthData != null) {
-            navController.navigate(R.id.action_loginFragment_to_workSitesFragment)
-        }
-
-        // Настраиваем обработчик нажатий на элементы нижней навигационной панели
-        binding.bottomNavigation.setOnItemSelectedListener { mi ->
-            when (mi.itemId) {
-                // При выборе "Главная"
-                R.id.mHome -> {
-                    // Если текущий экран — не workSitesFragment, переходим к нему
-                    if ((navController.currentDestination?.id ?: false) != R.id.workSitesFragment) {
-                        navController.navigate(R.id.action_profileFragment_to_workSitesFragment)
-                    }
-                }
-                // При выборе "Профиль"
-                R.id.mProfile -> {
-                    // Если текущий экран — не profileFragment, переходим к нему
-                    if ((navController.currentDestination?.id ?: false) != R.id.profileFragment) {
-                        navController.navigate(R.id.action_workSitesFragment_to_profileFragment)
-                    }
-                }
+            // Если пользователь уже авторизован (apiAuthData не null) — перенаправляем на экран рабочих площадок
+            if (viewModel.apiAuthData != null) {
+                navController.navigate(R.id.action_loginFragment_to_workSitesFragment)
             }
-            // Возвращаем true, чтобы подтвердить обработку нажатия
-            true
-        }
 
-        // Наблюдаем за изменениями в стеке навигации для управления видимостью нижней панели
-        lifecycleScope.launch(Dispatchers.IO) {
-            navController.currentBackStackEntryFlow.collect { entry ->
-                // Определяем, должна ли быть видна нижняя панель
-                val navbarVisibility = when (entry.destination.id) {
-                    R.id.workSitesFragment, R.id.profileFragment -> View.VISIBLE
-                    else -> View.GONE
+            // Настраиваем обработчик нажатий на элементы нижней навигационной панели
+            binding.bottomNavigation.setOnItemSelectedListener { mi ->
+                when (mi.itemId) {
+                    // При выборе "Главная"
+                    R.id.mHome -> {
+                        // Если текущий экран — не workSitesFragment, переходим к нему
+                        if ((navController.currentDestination?.id ?: false) != R.id.workSitesFragment) {
+                            navController.navigate(R.id.action_profileFragment_to_workSitesFragment)
+                        }
+                    }
+                    // При выборе "Профиль"
+                    R.id.mProfile -> {
+                        // Если текущий экран — не profileFragment, переходим к нему
+                        if ((navController.currentDestination?.id ?: false) != R.id.profileFragment) {
+                            navController.navigate(R.id.action_workSitesFragment_to_profileFragment)
+                        }
+                    }
                 }
-                // Обновляем UI на главном потоке
-                launch(Dispatchers.Main) {
-                    binding.bottomNavigation.visibility = navbarVisibility
-                    // Синхронизируем выделенный элемент навигационной панели с текущим экраном
-                    when (entry.destination.id) {
-                        R.id.workSitesFragment -> binding.bottomNavigation.selectedItemId = R.id.mHome
-                        R.id.profileFragment -> binding.bottomNavigation.selectedItemId = R.id.mProfile
+                // Возвращаем true, чтобы подтвердить обработку нажатия
+                true
+            }
+
+            // Наблюдаем за изменениями в стеке навигации для управления видимостью нижней панели
+            lifecycleScope.launch(Dispatchers.IO) {
+                navController.currentBackStackEntryFlow.collect { entry ->
+                    // Определяем, должна ли быть видна нижняя панель
+                    val navbarVisibility = when (entry.destination.id) {
+                        R.id.workSitesFragment, R.id.profileFragment -> View.VISIBLE
+                        else -> View.GONE
+                    }
+                    // Обновляем UI на главном потоке
+                    launch(Dispatchers.Main) {
+                        binding.bottomNavigation.visibility = navbarVisibility
+                        // Синхронизируем выделенный элемент навигационной панели с текущим экраном
+                        when (entry.destination.id) {
+                            R.id.workSitesFragment -> binding.bottomNavigation.selectedItemId = R.id.mHome
+                            R.id.profileFragment -> binding.bottomNavigation.selectedItemId = R.id.mProfile
+                        }
                     }
                 }
             }
