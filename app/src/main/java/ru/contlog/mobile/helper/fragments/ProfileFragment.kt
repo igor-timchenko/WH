@@ -50,6 +50,7 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        /*  Убрал ошибку при осутствии интернета
         // Подписка на ошибки — показываем только ошибку, скрываем профиль
         viewModel.errors.observe(viewLifecycleOwner) { errors ->
             if (errors.isNotEmpty()) {
@@ -59,7 +60,7 @@ class ProfileFragment : Fragment() {
             } else {
                 binding.errorsCard.visibility = View.GONE
             }
-        }
+        }*/
 
         // Подписываемся на данные пользователя
         viewModel.userData.observe(viewLifecycleOwner) { userData ->

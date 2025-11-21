@@ -82,8 +82,8 @@ class DivisionsListFragment : Fragment() {
             binding.divisionsListEmptyInfo.visibility = View.GONE
         }
 
-        // Подписка на ошибки — показываем только ошибку, скрываем профиль
-        // ВОПРОС: а нужен ли этот код, когда есть код сверху?
+        /* Убрал ошибку при осутствии интернета
+        // Подписка на ошибки — показываем только ошибку
         viewModel.errors.observe(viewLifecycleOwner) { errors ->
             if (errors.isNotEmpty()) {
                 binding.errorsText.text = "Ошибка соединения, проверьте подключение"
@@ -92,7 +92,8 @@ class DivisionsListFragment : Fragment() {
             } else {
                 binding.errorsCard.visibility = View.GONE
             }
-        }
+        }*/
+
         // Создаём адаптер RecyclerView с лямбдой-обработчиком клика по элементу
         val adapter = DivisionsRVAdapter { division ->
             // При клике создаём Bundle с выбранным подразделением
