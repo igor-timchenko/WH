@@ -27,17 +27,19 @@
             android:id="@+id/productName4"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginTop="8dp"
-            android:text="Выбирите площадку для начала сканирования"
+            android:gravity="center"
+            android:text="Выберите площадку:"
             android:textAlignment="center"
             android:textSize="16sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@+id/productInfoToolbar4"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/productInfoToolbar4"
+            app:layout_constraintVertical_bias="1.0"
             tools:ignore="HardcodedText"
-            tools:text="Выбирите площадку для начала сканирования" />
+            tools:text="Выберите площадку:" />
 
         <androidx.cardview.widget.CardView
             android:id="@+id/errorsCard"
