@@ -39,7 +39,8 @@
             app:layout_constraintTop_toTopOf="@+id/productInfoToolbar4"
             app:layout_constraintVertical_bias="1.0"
             tools:ignore="HardcodedText"
-            tools:text="Выберите площадку:" />
+            tools:text="Выберите площадку:"
+            />
 
         <androidx.cardview.widget.CardView
             android:id="@+id/errorsCard"
