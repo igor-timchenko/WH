@@ -1,8 +1,12 @@
 package ru.contlog.mobile.helper.rvadapters
 
 // Импорты стандартных классов Android для работы с UI и RecyclerView
+import android.text.SpannableString
 import android.view.LayoutInflater      // Для создания View из XML-файлов
 import android.view.ViewGroup           // Контейнер для элементов RecyclerView
+import android.widget.ImageView
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.DrawableCompat
 // Базовый класс для адаптера и ViewHolder'а списков
 import androidx.recyclerview.widget.RecyclerView
 // Ресурсы приложения (цвета, строки и т.д.)
@@ -53,12 +57,27 @@ class ProductPlacesRVAdapter(
 
         // Метод для привязки данных модели к UI
         fun bind(place: ProductPlace, itemUnit: String) {
-            // Формируем название места: код адреса + "(Основное место)", если это основное место
-            binding.placeName.text = buildString {
+            // Формируем название места: код адреса + "(Основное место)" с галочкой, если это основное место
+            val placeNameText = buildString {
                 append(place.addressCode.trim())
                 if (place.primaryPlace) {
                     append(" (Основное место)")
                 }
+            }
+
+            if (place.primaryPlace) {
+                // Создаем SpannableString для добавления галочки
+                val spannable = SpannableString("$placeNameText ")
+                val icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_check_green)
+                icon?.setBounds(0, 0, icon.intrinsicWidth, icon.intrinsicHeight)
+
+                // Добавляем галочку в конец текста
+                val imageSpan = ImageSpan(icon!!, ImageSpan.ALIGN_BASELINE)
+                spannable.setSpan(imageSpan, spannable.length - 1, spannable.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+
+                binding.placeName.text = spannable
+            } else {
+                binding.placeName.text = placeNameText
             }
 
             // Отображаем свободный остаток с единицей измерения
