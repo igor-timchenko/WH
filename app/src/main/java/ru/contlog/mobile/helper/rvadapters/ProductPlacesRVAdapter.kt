@@ -1,10 +1,7 @@
 package ru.contlog.mobile.helper.rvadapters
 
 // Импорты стандартных классов Android для работы с UI и RecyclerView
-import android.annotation.SuppressLint
-import android.text.Spannable
 import android.text.SpannableString
-import android.text.style.ImageSpan
 import android.view.LayoutInflater      // Для создания View из XML-файлов
 import android.view.ViewGroup           // Контейнер для элементов RecyclerView
 import android.widget.ImageView
@@ -59,7 +56,6 @@ class ProductPlacesRVAdapter(
         RecyclerView.ViewHolder(binding.root) { // itemView = binding.root
 
         // Метод для привязки данных модели к UI
-        @SuppressLint("NewApi")
         fun bind(place: ProductPlace, itemUnit: String) {
             // Формируем название места: код адреса + "(Основное место)" с галочкой, если это основное место
             val placeNameText = buildString {
@@ -72,7 +68,7 @@ class ProductPlacesRVAdapter(
             if (place.primaryPlace) {
                 // Создаем SpannableString для добавления галочки
                 val spannable = SpannableString("$placeNameText ")
-                val icon = ContextCompat.getDrawable(binding.root.context, R.drawable.ic_check_green)
+                val icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_check_green)
                 icon?.setBounds(0, 0, icon.intrinsicWidth, icon.intrinsicHeight)
 
                 // Добавляем галочку в конец текста
