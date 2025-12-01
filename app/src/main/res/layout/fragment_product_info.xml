@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F1F1F1"
+    android:background="@color/white"
     >
 
     <ProgressBar
@@ -24,24 +24,28 @@
         android:id="@+id/productInfoToolbar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@color/gray1"
+        android:background="@color/button_primary"
         android:minHeight="?attr/actionBarSize"
         android:theme="?attr/actionBarTheme"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:navigationIcon="@drawable/outline_arrow_back_24"
-        app:navigationIconTint="@color/black"
-        app:titleTextColor="@color/black"
+        app:navigationIconTint="@color/white"
+        app:titleTextColor="@color/white"
         tools:title="Сканирование" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/productsList"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="100dp"
         android:layout_marginBottom="8dp"
-        android:backgroundTint="@color/background_primary"
+        android:background="@color/white"
+        android:backgroundTint="@color/white"
+        app:itemIconTint="@color/button_primary"
+        app:itemRippleColor="@color/button_primary"
+        app:itemTextColor="@color/button_primary"
         app:layout_constraintBottom_toTopOf="@+id/scan"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -49,21 +53,78 @@
         tools:listitem="@layout/item_product" />
 
     <LinearLayout
+        android:id="@+id/searchContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:background="@color/button"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        app:layout_constraintBottom_toTopOf="@+id/productsList"
+        app:layout_constraintTop_toBottomOf="@+id/productInfoToolbar"
+        tools:ignore="MissingConstraints">
+
+        <ImageView
+            android:id="@+id/searchIcon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginEnd="8dp" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="@string/search_hint">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/searchInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:background="@color/white"
+                android:imeOptions="actionSearch"
+                android:inputType="text"
+                android:scrollbarTrackHorizontal="@color/button_primary"
+                android:textColor="@color/button_primary"
+                android:textColorHighlight="@color/button_primary"
+                android:textColorHint="@color/button_primary"
+                android:textColorLink="@color/button_primary"
+                app:itemIconTint="@color/button_primary"
+                app:itemRippleColor="@color/button_primary"
+                app:itemTextColor="@color/button_primary" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/searchButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+
+            android:text="@string/search_button_text"
+            app:backgroundTint="@color/red" />
+
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/productsListEmptyInfo"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="50dp"
         android:layout_marginEnd="8dp"
         android:gravity="center"
         android:orientation="vertical"
         android:visibility="gone"
+        app:itemRippleColor="@color/button_primary"
         app:layout_constraintBottom_toBottomOf="@+id/productsList"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/productsList"
-        tools:visibility="visible"
-        tools:ignore="UseCompoundDrawables">
+        tools:ignore="UseCompoundDrawables"
+        tools:visibility="visible">
 
         <ImageView
             android:id="@+id/imageView4"

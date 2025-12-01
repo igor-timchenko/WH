@@ -14,6 +14,8 @@
     <string name="smsSentTo">СМС код отправлен на номер телефона +7%1$s</string>
     <string name="smsSentCode">Код должен содержать 5 цифр</string>
 
+    <string name="search_hint">Поиск по коду, артикулу, штрих-коду товара…</string>
+    <string name="search_button_text">Поиск</string>
     <string name="errorSendingSMS">Ошибка отправки СМС</string>
     <string name="errorCheckingSMS">Ошибка проверки СМС</string>
     <string name="ok">Ок</string>

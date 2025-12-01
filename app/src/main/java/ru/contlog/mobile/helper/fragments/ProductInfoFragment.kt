@@ -1,6 +1,7 @@
 package ru.contlog.mobile.helper.fragments
 
 // Импорты системных и сторонних библиотек
+import android.annotation.SuppressLint
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
@@ -10,12 +11,16 @@ import android.util.Log                     // Для логирования о�
 import android.view.LayoutInflater          // Для создания UI из XML-разметки
 import android.view.View                    // Базовый класс представления
 import android.view.ViewGroup               // Контейнер для View
+import android.view.inputmethod.EditorInfo
+import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.result.ActivityResultCallback // Обратный вызов результата активности
 import androidx.fragment.app.Fragment       // Базовый класс фрагмента
 import androidx.fragment.app.viewModels     // Делегат для получения ViewModel, привязанной к фрагменту
 import androidx.lifecycle.lifecycleScope   // Область корутин, привязанная к жизненному циклу
 import androidx.navigation.fragment.findNavController // Утилита для навигации между фрагментами
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.textfield.TextInputEditText
 import com.journeyapps.barcodescanner.ScanContract // Контракт для сканирования штрихкода (библиотека ZXing)
 import com.journeyapps.barcodescanner.ScanIntentResult // Результат сканирования
 import com.journeyapps.barcodescanner.ScanOptions // Настройки сканера
@@ -40,7 +45,12 @@ import ru.contlog.mobile.helper.vm.factories.AppViewModelFactory // Фабрик
 class ProductInfoFragment : Fragment() {
     // ViewBinding для безопасного доступа к UI-элементам
     private lateinit var binding: FragmentProductInfoBinding
-    
+
+    // В начале класса, после binding
+    private lateinit var searchInput: TextInputEditText
+    private lateinit var searchButton: MaterialButton
+
+
     // Флаг для отслеживания первой загрузки данных
     private var isFirstLoad = true
     
@@ -107,6 +117,34 @@ class ProductInfoFragment : Fragment() {
         // Обрабатываем нажатие на кнопку "назад" в тулбаре
         binding.productInfoToolbar.setNavigationOnClickListener {
             findNavController().navigate(R.id.action_productInfoFragment_to_workSitesFragment)
+        }
+
+        // 🔹 ИНИЦИАЛИЗАЦИЯ ЭЛЕМЕНТОВ ПОИСКА
+        searchInput = binding.searchInput
+        searchButton = binding.searchButton
+
+        // 🔹 ОБРАБОТЧИК НАЖАТИЯ КНОПКИ "ПОИСК"
+        searchButton.setOnClickListener {
+            val query = searchInput.text.toString().trim()
+            if (query.isNotEmpty()) {
+                if (!isOnline()) {
+                    Toast.makeText(requireContext(), "Ошибка соединения, проверьте подключение!", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+                performSearch(query)
+            } else {
+                Toast.makeText(requireContext(), "Введите запрос для поиска", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        // 🔹 ОБРАБОТЧИК НАЖАТИЯ ENTER НА КЛАВИАТУРЕ
+        searchInput.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                searchButton.performClick() // Имитируем клик по кнопке
+                true
+            } else {
+                false
+            }
         }
 
         // 🔹 ОБНОВЛЁННЫЙ ОБРАБОТЧИК: проверка интернета перед сканированием
@@ -200,6 +238,7 @@ class ProductInfoFragment : Fragment() {
     }
 
     // Метод загрузки данных по отсканированному коду
+    @SuppressLint("UseKtx")
     private fun loadData(code: String) {
         // Сбрасываем предыдущие данные и флаг первой загрузки для новой анимации
         productViewModel.setProducts(null)
@@ -318,6 +357,7 @@ class ProductInfoFragment : Fragment() {
         val animatorSet = android.animation.AnimatorSet().apply {
             playSequentially(scaleUpSet, scaleDownSet)
             addListener(object : android.animation.AnimatorListenerAdapter() {
+                @SuppressLint("UseKtx")
                 override fun onAnimationEnd(animation: android.animation.Animator) {
                     // Повторяем анимацию, если overlay все еще виден
                     if (binding.loadingOverlay.visibility == View.VISIBLE) {
@@ -363,6 +403,7 @@ class ProductInfoFragment : Fragment() {
     }
 
     // 🔹 МЕТОД ПРОВЕРКИ ДОСТУПА В ИНТЕРНЕТ
+    @SuppressLint("ObsoleteSdkInt")
     private fun isOnline(): Boolean {
         val connectivityManager = requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -377,6 +418,7 @@ class ProductInfoFragment : Fragment() {
     }
     
     // Освобождение ресурсов при уничтожении View для предотвращения утечек
+    @SuppressLint("UseKtx")
     override fun onDestroyView() {
         super.onDestroyView()
         // Останавливаем анимацию загрузки при уничтожении View
@@ -387,5 +429,23 @@ class ProductInfoFragment : Fragment() {
         if (::binding.isInitialized && binding.loadingOverlay.visibility == View.VISIBLE) {
             hideLoadingOverlay()
         }
+    }
+
+    /**
+     * Выполняет поиск по введенному запросу.
+     * @param query Строка поиска (артикул, штрих-код и т.д.)
+     */
+    private fun performSearch(query: String) {
+        // Логируем запрос для отладки
+        Log.i("ProductInfoFragment", "Выполняется поиск по запросу: $query")
+
+        // Устанавливаем запрос в ViewModel (если нужно для истории)
+        productViewModel.setScannedCode(query)
+
+        // Загружаем данные по этому запросу
+        loadData(query)
+
+        // Очищаем поле ввода после запуска поиска (опционально)
+        searchInput.text?.clear()
     }
 }

@@ -12,6 +12,7 @@
     <color name="button_primary">#154367</color>
     <color name="background_primary">#F0F0F0</color>
     <color name="gray1">#D3D3D3</color>
+    <color name="button_1">#00B8A0</color>
     <color name="button">#00B8D4</color>
     <color name="statusBarColor">#CACACA</color>
     <color name="enabledButtonColor">#505AA4</color>
