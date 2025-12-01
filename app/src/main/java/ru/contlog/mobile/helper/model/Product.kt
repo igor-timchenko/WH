@@ -42,7 +42,7 @@ data class Product(
     // Строковое представление ссылки на объект в системе (например, GUID или путь). JSON-ключ: "СсылкаОбъектСтрокой"
     @SerialName("СсылкаОбъектСтрокой") val productLinkString: String,
 
-    // Дата и время создания записи. Используется тип kotlinx.datetime.LocalDateTime.
+    // Дата и время создания записи. Используется тип kotlinx.datetime.LocalDateTime.        
     // JSON-ключ: "ДатаСоздания"
     @SerialName("ДатаСоздания") val createdOn: LocalDateTime,
 

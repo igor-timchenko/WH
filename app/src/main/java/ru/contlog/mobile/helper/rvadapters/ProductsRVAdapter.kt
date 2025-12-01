@@ -133,7 +133,7 @@ class ProductsRVAdapter(val onChildScrollRequested: (Boolean) -> Unit) :
             } else {
                 // Устанавливаем заголовок с количеством мест
                 binding.expansionTitle.text =
-                    binding.root.context.getString(R.string.title_places_exp, count)
+                    binding.root.context.getString(R.string.title_places_exp, count, product.unitName)
                 // Настраиваем обработчик клика по заголовку для раскрытия/скрытия списка мест
                 binding.expansionHeader.setOnClickListener {
                     // Переключаем видимость контента
