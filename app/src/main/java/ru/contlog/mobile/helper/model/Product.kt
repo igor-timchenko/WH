@@ -67,5 +67,5 @@ data class Product(
     // Вычисляемое свойство: формирует URL изображения продукта на основе его UID.
     // Обратите внимание: в строке присутствует два пробела после "/img/" —
     // это сохранено как есть, согласно исходному коду (возможно, опечатка, но не исправляется по требованию).
-    val imageSrc = "https://my.contlog.ru/img/$productUID"
+    val imageSrc = "https://my.contlog.ru/img/${ if (places.isEmpty()) {productUID} else {places[0].nomenclatureUID}}"
 }

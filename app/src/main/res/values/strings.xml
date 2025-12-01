@@ -25,7 +25,7 @@
     <string name="label_divisions_list_empty">Список площадок пуст</string>
     <string name="label_scan">Сканирование</string>
     <string name="cd_scan_button">Кнопка сканнирования</string>
-    <string name="title_places_exp">Места хранения (%d шт.)</string>
+    <string name="title_places_exp">Места хранения (%d %s)</string>
     <string name="label_no_product_places">Места хранения отсутствуют</string>
     <string name="cd_product_image">Картинка товара</string>
     <string name="label_leftovers">Остаток:</string>
