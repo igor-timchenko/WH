@@ -16,7 +16,7 @@
             android:id="@+id/productInfoToolbar4"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:background="@color/gray1"
+            android:background="@color/button_primary"
             android:minHeight="?attr/actionBarSize"
             android:theme="?attr/actionBarTheme"
             app:layout_constraintEnd_toEndOf="parent"
@@ -30,6 +30,7 @@
             android:gravity="center"
             android:text="Выберите площадку:"
             android:textAlignment="center"
+            android:textColor="@color/white"
             android:textSize="16sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@+id/productInfoToolbar4"
@@ -39,8 +40,7 @@
             app:layout_constraintTop_toTopOf="@+id/productInfoToolbar4"
             app:layout_constraintVertical_bias="1.0"
             tools:ignore="HardcodedText"
-            tools:text="Выберите площадку:"
-            />
+            tools:text="Выберите площадку:" />
 
         <androidx.cardview.widget.CardView
             android:id="@+id/errorsCard"
