@@ -13,3 +13,8 @@
 .externalNativeBuild
 .cxx
 local.properties
+*.idea
+/app
+simple_key.jks
+SUPPLIER_CONTINENT1.jks
+
