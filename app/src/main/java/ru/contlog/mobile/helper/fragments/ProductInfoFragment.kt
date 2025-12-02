@@ -125,6 +125,7 @@ class ProductInfoFragment : Fragment() {
 
         // 🔹 ОБРАБОТЧИК НАЖАТИЯ КНОПКИ "ПОИСК"
         searchButton.setOnClickListener {
+            searchInput.clearFocus()
             val query = searchInput.text.toString().trim()
             if (query.isNotEmpty()) {
                 if (!isOnline()) {

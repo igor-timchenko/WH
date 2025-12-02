@@ -39,7 +39,6 @@
         android:id="@+id/productsList"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="100dp"
         android:layout_marginBottom="8dp"
         android:background="@color/white"
         android:backgroundTint="@color/white"
@@ -49,51 +48,39 @@
         app:layout_constraintBottom_toTopOf="@+id/scan"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/productInfoToolbar"
+        app:layout_constraintTop_toBottomOf="@+id/searchContainer"
         tools:listitem="@layout/item_product" />
 
     <LinearLayout
         android:id="@+id/searchContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="2dp"
-        android:background="@color/button"
+        android:background="@color/button_primary"
         android:orientation="horizontal"
-        android:padding="16dp"
         app:layout_constraintBottom_toTopOf="@+id/productsList"
         app:layout_constraintTop_toBottomOf="@+id/productInfoToolbar"
-        tools:ignore="MissingConstraints">
-
-        <ImageView
-            android:id="@+id/searchIcon"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_gravity="center_vertical"
-            android:layout_marginEnd="8dp" />
+        app:layout_constraintVertical_bias="0.0"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="8dp">
 
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:hint="@string/search_hint">
+            android:hint="@string/search_hint"
+            android:textColorHint="@color/button_primary"
+            app:hintTextColor="@color/white">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/searchInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-
+                android:layout_margin="12dp"
                 android:background="@color/white"
                 android:imeOptions="actionSearch"
                 android:inputType="text"
-                android:scrollbarTrackHorizontal="@color/button_primary"
-                android:textColor="@color/button_primary"
-                android:textColorHighlight="@color/button_primary"
-                android:textColorHint="@color/button_primary"
-                android:textColorLink="@color/button_primary"
-                app:itemIconTint="@color/button_primary"
-                app:itemRippleColor="@color/button_primary"
-                app:itemTextColor="@color/button_primary" />
+                android:padding="8dp" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -102,7 +89,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-
+            android:visibility="gone"
             android:text="@string/search_button_text"
             app:backgroundTint="@color/red" />
 
