@@ -9,7 +9,7 @@
     android:background="@color/white"
     android:backgroundTint="@color/white"
     app:strokeColor="@color/button_primary"
-    app:strokeWidth="2dp">
+    app:strokeWidth="0.5dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"

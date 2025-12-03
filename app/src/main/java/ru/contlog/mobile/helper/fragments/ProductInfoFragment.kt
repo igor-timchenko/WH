@@ -7,6 +7,9 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build                   // Для проверки версии Android API
 import android.os.Bundle                    // Для передачи данных между компонентами
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
 import android.util.Log                     // Для логирования отладочной информации
 import android.view.LayoutInflater          // Для создания UI из XML-разметки
 import android.view.View                    // Базовый класс представления
@@ -15,6 +18,7 @@ import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.result.ActivityResultCallback // Обратный вызов результата активности
+import android.graphics.Color
 import androidx.fragment.app.Fragment       // Базовый класс фрагмента
 import androidx.fragment.app.viewModels     // Делегат для получения ViewModel, привязанной к фрагменту
 import androidx.lifecycle.lifecycleScope   // Область корутин, привязанная к жизненному циклу
@@ -212,8 +216,13 @@ class ProductInfoFragment : Fragment() {
 
         // Подписываемся на изменения отсканированного кода
         productViewModel.scannedCode.observe(viewLifecycleOwner) { code ->
-            // Устанавливаем подзаголовок тулбара в формате "Отсканировано: XXX"
-            binding.productInfoToolbar.subtitle = code?.let { getString(R.string.scanned_label, it) }
+            // Устанавливаем подзаголовок тулбара в формате "Отсканировано: XXX" белым цветом
+            binding.productInfoToolbar.subtitle = code?.let {
+                val text = getString(R.string.scanned_label, it)
+                SpannableString(text).apply {
+                    setSpan(ForegroundColorSpan(Color.WHITE), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                }
+            }
         }
 
         // Привязываем адаптер к RecyclerView
