@@ -1,6 +1,8 @@
 package ru.contlog.mobile.helper.fragments
 
 // Импорты системных и сторонних библиотек
+import android.R.attr.endY
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.net.ConnectivityManager
@@ -19,6 +21,10 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.result.ActivityResultCallback // Обратный вызов результата активности
 import android.graphics.Color
+import android.view.animation.LinearInterpolator
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.fragment.app.Fragment       // Базовый класс фрагмента
 import androidx.fragment.app.viewModels     // Делегат для получения ViewModel, привязанной к фрагменту
 import androidx.lifecycle.lifecycleScope   // Область корутин, привязанная к жизненному циклу
@@ -54,6 +60,12 @@ class ProductInfoFragment : Fragment() {
     private lateinit var searchInput: TextInputEditText
     private lateinit var searchButton: MaterialButton
 
+    private lateinit var scannerContainer: LinearLayout
+    private lateinit var scannerLine: View
+    private lateinit var scanTitle: TextView
+    private lateinit var scannerIcon: ImageView
+
+
 
     // Флаг для отслеживания первой загрузки данных
     private var isFirstLoad = true
@@ -77,16 +89,19 @@ class ProductInfoFragment : Fragment() {
 
     // Регистрация лаунчера для сканирования штрихкода
     private val barcodeLauncher = registerForActivityResult<ScanOptions?, ScanIntentResult?>(
-        ScanContract(), // Используем контракт из библиотеки ZXing
+        ScanContract(),
         ActivityResultCallback { result: ScanIntentResult? ->
-            // Логируем результат сканирования для отладки
             Log.i("ScanIntentResult", "$result")
-            // Если сканирование прошло успешно и есть содержимое — обрабатываем код
-            if (result!!.contents != null) {
+
+            // 🔹 Остановить анимацию
+            stopScannerAnimation()
+
+            // 🔹 Скрыть блок сканера после сканирования
+            scannerContainer.visibility = View.GONE
+
+            if (result != null && result.contents != null) {
                 val code = result.contents
-                // Сохраняем отсканированный код в ViewModel
                 productViewModel.setScannedCode(code)
-                // Загружаем данные по этому коду
                 loadData(code)
             }
         })
@@ -115,6 +130,11 @@ class ProductInfoFragment : Fragment() {
                 requireArguments().getSerializable("division") as Division
             }!!
         )
+
+        scannerContainer = binding.scannerContainer
+        scannerLine = binding.scannerLine
+        scanTitle = binding.scanTitle
+        scannerIcon = binding.scannerIcon
 
         // Устанавливаем название тулбара как имя подразделения
         binding.productInfoToolbar.title = productViewModel.division.value!!.name
@@ -154,10 +174,22 @@ class ProductInfoFragment : Fragment() {
 
         // 🔹 ОБНОВЛЁННЫЙ ОБРАБОТЧИК: проверка интернета перед сканированием
         binding.scan.setOnClickListener {
+
+            // 🔹 Запустить анимацию
+            startScannerAnimation()
+
             if (!isOnline()) {
                 Toast.makeText(requireContext(), "Ошибка соединения, проверьте подключение!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
+
+            // 🔹 Показываем UI сканера
+            scannerContainer.visibility = View.VISIBLE
+
+            // 🔹 Остановить анимацию
+            stopScannerAnimation()
+
+            // 🔹 Запускаем сканирование
             doScan()
         }
 
@@ -457,5 +489,29 @@ class ProductInfoFragment : Fragment() {
 
         // Очищаем поле ввода после запуска поиска (опционально)
         searchInput.text?.clear()
+    }
+
+    private var scannerLineAnimator: ValueAnimator? = null
+
+    private fun startScannerAnimation() {
+        scannerLine.visibility = View.VISIBLE
+        val startY = scannerContainer.y + 1f
+        scannerLineAnimator = ValueAnimator.ofFloat(startY).apply {
+            duration = 1500L
+            repeatCount = ValueAnimator.INFINITE
+            repeatMode = ValueAnimator.REVERSE
+            interpolator = LinearInterpolator()
+            addUpdateListener { animation ->
+                val value = animation.animatedValue as Float
+                scannerLine.y = value
+            }
+        }
+        scannerLineAnimator?.start()
+    }
+
+    private fun stopScannerAnimation() {
+        scannerLineAnimator?.cancel()
+        scannerLineAnimator = null
+        scannerLine.visibility = View.GONE
     }
 }

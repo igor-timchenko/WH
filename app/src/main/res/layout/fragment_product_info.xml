@@ -51,6 +51,57 @@
         app:layout_constraintTop_toBottomOf="@+id/searchContainer"
         tools:listitem="@layout/item_product" />
 
+    <!-- БЛОК СКАНИРОВАНИЯ -->
+    <LinearLayout
+        android:id="@+id/scannerContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="125dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:visibility="visible"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="MissingConstraints"
+        tools:visibility="visible">
+
+        <!-- 🔴 КРАСНАЯ ЛИНИЯ СВЕРХУ -->
+        <View
+            android:id="@+id/scannerLine"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:alpha="0.8"
+            android:background="@color/red" />
+
+        <!-- ТЕКСТ "Сканируй ШТРИХ-КОД/QR-КОД" -->
+        <TextView
+            android:id="@+id/scanTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="@string/scan_title"
+            android:textColor="@android:color/black"
+            android:textSize="18sp" />
+
+        <!-- ИКОНКА СКАНЕРА -->
+        <ImageView
+            android:id="@+id/scannerIcon"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginBottom="25dp"
+            android:src="@drawable/scanner"
+            tools:ignore="ContentDescription" />
+
+        <!-- ИКОНКА КАМЕРЫ -->
+        <ImageView
+            android:id="@+id/camera"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginBottom="25dp"
+            android:src="@drawable/camera"
+            tools:ignore="ContentDescription" />
+
+    </LinearLayout>
     <LinearLayout
         android:id="@+id/searchContainer"
         android:layout_width="match_parent"
@@ -64,16 +115,20 @@
         tools:layout_editor_absoluteX="8dp">
 
         <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-            android:layout_width="match_parent"
+            style="@style/CustomHint"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="2"
-            android:paddingTop="20dp"
+            android:layout_weight="1"
+            android:gravity="start"
             android:hint="@string/search_hint"
+            android:lineSpacingExtra="60dp"
+            android:paddingTop="20dp"
             android:textColorHint="@color/button_primary"
             android:textColorLink="@color/button_primary"
-            app:hintTextColor="@color/white"
-            app:hintEnabled="true">
+            app:expandedHintEnabled="true"
+            app:hintAnimationEnabled="true"
+            app:hintEnabled="true"
+            app:hintTextColor="@color/white">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/searchInput"
@@ -88,8 +143,7 @@
                 android:paddingBottom="4dp"
                 android:textColorHighlight="@color/button_primary"
                 android:textColorHint="@color/button_primary"
-                android:textColorLink="@color/button_primary"
-                app:hintEnabled="true" />
+                android:textColorLink="@color/button_primary" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -197,6 +251,7 @@
                 android:textStyle="bold" />
 
         </LinearLayout>
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

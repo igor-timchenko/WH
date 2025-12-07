@@ -49,16 +49,16 @@ class ProductInfoFragment : Fragment() {
 
     // Регистрация лаунчера для сканирования штрихкода
     private val barcodeLauncher = registerForActivityResult<ScanOptions?, ScanIntentResult?>(
-        ScanContract(), // Используем контракт из библиотеки ZXing
+        ScanContract(),
         ActivityResultCallback { result: ScanIntentResult? ->
-            // Логируем результат сканирования для отладки
             Log.i("ScanIntentResult", "$result")
-            // Если сканирование прошло успешно и есть содержимое — обрабатываем код
-            if (result!!.contents != null) {
+
+            // 🔹 ОСТАНАВЛИВАЕМ АНИМАЦИЮ ЛИНИИ
+            stopScannerAnimation()
+
+            if (result != null && result.contents != null) {
                 val code = result.contents
-                // Сохраняем отсканированный код в ViewModel
                 productViewModel.setScannedCode(code)
-                // Загружаем данные по этому коду
                 loadData(code)
             }
         })
