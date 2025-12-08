@@ -64,7 +64,6 @@ class ProductInfoFragment : Fragment() {
     private lateinit var scannerContainer: LinearLayout
     private lateinit var scannerLine: View
     private lateinit var scanTitle: TextView
-    private lateinit var scannerIcon: ImageView
     private lateinit var cameraIcon: ImageView
 
 
@@ -140,7 +139,6 @@ class ProductInfoFragment : Fragment() {
         scannerContainer = binding.scannerContainer
         scannerLine = binding.scannerLine
         scanTitle = binding.scanTitle
-        scannerIcon = binding.scannerIcon
         cameraIcon = binding.camera
 
 
@@ -472,6 +470,7 @@ class ProductInfoFragment : Fragment() {
     @SuppressLint("UseKtx")
     override fun onDestroyView() {
         super.onDestroyView()
+
         // Останавливаем анимацию загрузки при уничтожении View
         loadingIndicatorAnimator?.cancel()
         loadingIndicatorAnimator = null
@@ -489,11 +488,12 @@ class ProductInfoFragment : Fragment() {
     private fun performSearch(query: String) {
         // Логируем запрос для отладки
         Log.i("ProductInfoFragment", "Выполняется поиск по запросу: $query")
+
         // 🔹 Остановить анимацию
         stopScannerAnimation()
+
         scannerLine.visibility = View.GONE
         scanTitle.visibility = View.GONE
-        scannerIcon.visibility = View.GONE
         cameraIcon.visibility = View.GONE
 
 

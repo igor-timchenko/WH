@@ -56,7 +56,7 @@
         android:id="@+id/scannerContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="125dp"
+        android:layout_marginTop="260dp"
         android:gravity="center"
         android:orientation="vertical"
         android:padding="24dp"
@@ -64,6 +64,15 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="MissingConstraints"
         tools:visibility="visible">
+
+        <!-- ИКОНКА КАМЕРЫ -->
+        <ImageView
+            android:id="@+id/camera"
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:layout_marginBottom="25dp"
+            android:src="@drawable/camera"
+            tools:ignore="ContentDescription" />
 
         <!-- 🔴 КРАСНАЯ ЛИНИЯ СВЕРХУ -->
         <View
@@ -81,25 +90,10 @@
             android:layout_marginBottom="16dp"
             android:text="@string/scan_title"
             android:textColor="@android:color/black"
-            android:textSize="18sp" />
-
-        <!-- ИКОНКА СКАНЕРА -->
-        <ImageView
-            android:id="@+id/scannerIcon"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_marginBottom="25dp"
-            android:src="@drawable/scanner"
-            tools:ignore="ContentDescription" />
-
-        <!-- ИКОНКА КАМЕРЫ -->
-        <ImageView
-            android:id="@+id/camera"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_marginBottom="25dp"
-            android:src="@drawable/camera"
-            tools:ignore="ContentDescription" />
+            android:textSize="18sp"
+            android:maxLines="1"
+            android:ellipsize="none"
+            app:autoSizeTextType="uniform"/>
 
     </LinearLayout>
     <LinearLayout
