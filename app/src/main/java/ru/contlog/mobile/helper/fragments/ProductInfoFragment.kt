@@ -5,6 +5,7 @@ import android.R.attr.endY
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Camera
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build                   // Для проверки версии Android API
@@ -64,6 +65,7 @@ class ProductInfoFragment : Fragment() {
     private lateinit var scannerLine: View
     private lateinit var scanTitle: TextView
     private lateinit var scannerIcon: ImageView
+    private lateinit var cameraIcon: ImageView
 
 
 
@@ -135,6 +137,7 @@ class ProductInfoFragment : Fragment() {
         scannerLine = binding.scannerLine
         scanTitle = binding.scanTitle
         scannerIcon = binding.scannerIcon
+        cameraIcon = binding.camera
 
         // Устанавливаем название тулбара как имя подразделения
         binding.productInfoToolbar.title = productViewModel.division.value!!.name
@@ -149,6 +152,8 @@ class ProductInfoFragment : Fragment() {
 
         // 🔹 ОБРАБОТЧИК НАЖАТИЯ КНОПКИ "ПОИСК"
         searchButton.setOnClickListener {
+            // 🔹 Запустить анимацию
+            startScannerAnimation()
             searchInput.clearFocus()
             val query = searchInput.text.toString().trim()
             if (query.isNotEmpty()) {
@@ -174,9 +179,6 @@ class ProductInfoFragment : Fragment() {
 
         // 🔹 ОБНОВЛЁННЫЙ ОБРАБОТЧИК: проверка интернета перед сканированием
         binding.scan.setOnClickListener {
-
-            // 🔹 Запустить анимацию
-            startScannerAnimation()
 
             if (!isOnline()) {
                 Toast.makeText(requireContext(), "Ошибка соединения, проверьте подключение!", Toast.LENGTH_SHORT).show()
@@ -270,6 +272,9 @@ class ProductInfoFragment : Fragment() {
 
     // Метод запуска сканирования штрихкода
     private fun doScan() {
+        // 🔹 Остановить анимацию
+        stopScannerAnimation()
+
         val options = ScanOptions()
         options.setDesiredBarcodeFormats(ScanOptions.ALL_CODE_TYPES) // Поддерживаем все типы штрихкодов
         options.setPrompt("Scan a barcode") // Текст-подсказка на экране сканера
@@ -480,6 +485,13 @@ class ProductInfoFragment : Fragment() {
     private fun performSearch(query: String) {
         // Логируем запрос для отладки
         Log.i("ProductInfoFragment", "Выполняется поиск по запросу: $query")
+        // 🔹 Остановить анимацию
+        stopScannerAnimation()
+        scannerLine.visibility = View.GONE
+        scanTitle.visibility = View.GONE
+        scannerIcon.visibility = View.GONE
+        cameraIcon.visibility = View.GONE
+
 
         // Устанавливаем запрос в ViewModel (если нужно для истории)
         productViewModel.setScannedCode(query)
@@ -493,11 +505,22 @@ class ProductInfoFragment : Fragment() {
 
     private var scannerLineAnimator: ValueAnimator? = null
 
+    /**
+     * Запускает анимацию движения красной линии вверх-вниз.
+     */
     private fun startScannerAnimation() {
+
         scannerLine.visibility = View.VISIBLE
-        val startY = scannerContainer.y + 1f
-        scannerLineAnimator = ValueAnimator.ofFloat(startY).apply {
-            duration = 1500L
+
+        // Начальная позиция: чуть ниже верхней границы Титла
+        val startY = scanTitle.y + 1f
+
+        // Конечная позиция: до самого низа Титла
+        val endY = scanTitle.y + scanTitle.height - scannerLine.height
+
+        // Создаём аниматор
+        scannerLineAnimator = ValueAnimator.ofFloat(startY, endY).apply {
+            duration = 1500L         // 1.5 секунды на один цикл
             repeatCount = ValueAnimator.INFINITE
             repeatMode = ValueAnimator.REVERSE
             interpolator = LinearInterpolator()
@@ -509,6 +532,9 @@ class ProductInfoFragment : Fragment() {
         scannerLineAnimator?.start()
     }
 
+    /**
+     * Останавливает анимацию и скрывает линию.
+     */
     private fun stopScannerAnimation() {
         scannerLineAnimator?.cancel()
         scannerLineAnimator = null
