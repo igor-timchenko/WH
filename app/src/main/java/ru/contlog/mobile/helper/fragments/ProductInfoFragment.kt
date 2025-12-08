@@ -71,10 +71,10 @@ class ProductInfoFragment : Fragment() {
 
     // Флаг для отслеживания первой загрузки данных
     private var isFirstLoad = true
-    
+
     // Аниматор для пульсации индикатора загрузки
     private var loadingIndicatorAnimator: android.animation.Animator? = null
-    
+
     // Константы для анимации
     private companion object {
         const val ANIMATION_DURATION = 300L // Длительность анимации в миллисекундах
@@ -122,6 +122,10 @@ class ProductInfoFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.root.post {
+            startScannerAnimation()
+        }
+
         // Получаем объект Division из аргументов фрагмента
         // Используем безопасное получение для API 33+ (TIRAMISU)
         productViewModel.setDivision(
@@ -139,6 +143,7 @@ class ProductInfoFragment : Fragment() {
         scannerIcon = binding.scannerIcon
         cameraIcon = binding.camera
 
+
         // Устанавливаем название тулбара как имя подразделения
         binding.productInfoToolbar.title = productViewModel.division.value!!.name
         // Обрабатываем нажатие на кнопку "назад" в тулбаре
@@ -152,8 +157,7 @@ class ProductInfoFragment : Fragment() {
 
         // 🔹 ОБРАБОТЧИК НАЖАТИЯ КНОПКИ "ПОИСК"
         searchButton.setOnClickListener {
-            // 🔹 Запустить анимацию
-            startScannerAnimation()
+
             searchInput.clearFocus()
             val query = searchInput.text.toString().trim()
             if (query.isNotEmpty()) {
@@ -324,7 +328,7 @@ class ProductInfoFragment : Fragment() {
             }
         }
     }
-    
+
     // Метод показа overlay загрузки с анимацией появления
     private fun showLoadingOverlay() {
         // Устанавливаем текст загрузки
@@ -340,7 +344,7 @@ class ProductInfoFragment : Fragment() {
         // Анимация пульсации индикатора загрузки
         animateLoadingIndicator()
     }
-    
+
     // Метод скрытия overlay загрузки с анимацией исчезновения
     private fun hideLoadingOverlay() {
         // Останавливаем анимацию пульсации
@@ -359,7 +363,7 @@ class ProductInfoFragment : Fragment() {
                 }
             })
     }
-    
+
     // Метод анимации пульсации индикатора загрузки
     private fun animateLoadingIndicator() {
         // Останавливаем предыдущую анимацию, если она есть
@@ -393,14 +397,14 @@ class ProductInfoFragment : Fragment() {
         ).apply {
             duration = PULSE_DURATION / 2
         }
-        
+
         val scaleUpSet = android.animation.AnimatorSet().apply {
             playTogether(scaleUpX, scaleUpY)
         }
         val scaleDownSet = android.animation.AnimatorSet().apply {
             playTogether(scaleDownX, scaleDownY)
         }
-        
+
         val animatorSet = android.animation.AnimatorSet().apply {
             playSequentially(scaleUpSet, scaleDownSet)
             addListener(object : android.animation.AnimatorListenerAdapter() {
@@ -416,7 +420,7 @@ class ProductInfoFragment : Fragment() {
         loadingIndicatorAnimator = animatorSet
         animatorSet.start()
     }
-    
+
     // Метод анимации появления списка продуктов
     private fun animateProductsListAppearance() {
         binding.productsList.alpha = 0f
@@ -463,7 +467,7 @@ class ProductInfoFragment : Fragment() {
             connectivityManager.activeNetworkInfo?.isConnected == true
         }
     }
-    
+
     // Освобождение ресурсов при уничтожении View для предотвращения утечек
     @SuppressLint("UseKtx")
     override fun onDestroyView() {
