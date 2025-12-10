@@ -32,6 +32,7 @@ import androidx.lifecycle.lifecycleScope   // Область корутин, п�
 import androidx.navigation.fragment.findNavController // Утилита для навигации между фрагментами
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import com.journeyapps.barcodescanner.ScanContract // Контракт для сканирования штрихкода (библиотека ZXing)
 import com.journeyapps.barcodescanner.ScanIntentResult // Результат сканирования
 import com.journeyapps.barcodescanner.ScanOptions // Настройки сканера
@@ -94,14 +95,15 @@ class ProductInfoFragment : Fragment() {
         ActivityResultCallback { result: ScanIntentResult? ->
             Log.i("ScanIntentResult", "$result")
 
-            // 🔹 Остановить анимацию
-            stopScannerAnimation()
-
-            // 🔹 Скрыть блок сканера после сканирования
-            scannerContainer.visibility = View.GONE
-
             if (result != null && result.contents != null) {
                 val code = result.contents
+
+                // 🔹 Остановить анимацию
+                stopScannerAnimation()
+
+                // 🔹 Скрыть блок сканера после сканирования
+                scannerContainer.visibility = View.GONE
+
                 productViewModel.setScannedCode(code)
                 loadData(code)
             }
@@ -120,6 +122,8 @@ class ProductInfoFragment : Fragment() {
     // Настройка UI после создания View
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        applyHintFloatingPosition(binding.search1)
 
         binding.root.post {
             startScannerAnimation()
@@ -189,9 +193,6 @@ class ProductInfoFragment : Fragment() {
 
             // 🔹 Показываем UI сканера
             scannerContainer.visibility = View.VISIBLE
-
-            // 🔹 Остановить анимацию
-            stopScannerAnimation()
 
             // 🔹 Запускаем сканирование
             doScan()
@@ -274,9 +275,6 @@ class ProductInfoFragment : Fragment() {
 
     // Метод запуска сканирования штрихкода
     private fun doScan() {
-        // 🔹 Остановить анимацию
-        stopScannerAnimation()
-
         val options = ScanOptions()
         options.setDesiredBarcodeFormats(ScanOptions.ALL_CODE_TYPES) // Поддерживаем все типы штрихкодов
         options.setPrompt("Scan a barcode") // Текст-подсказка на экране сканера
@@ -543,5 +541,27 @@ class ProductInfoFragment : Fragment() {
         scannerLineAnimator?.cancel()
         scannerLineAnimator = null
         scannerLine.visibility = View.GONE
+    }
+
+    private fun applyHintFloatingPosition(til: TextInputLayout) {
+        til.post {
+            try {
+                val helperField = TextInputLayout::class.java.getDeclaredField("collapsingTextHelper")
+                helperField.isAccessible = true
+                val collapsingHelper = helperField[til] as Any
+
+                val setCollapsedBoundsMethod = collapsingHelper.javaClass.getDeclaredMethod(
+                    "setCollapsedBounds", Int::class.java, Int::class.java,
+                    Int::class.java, Int::class.java
+                )
+                setCollapsedBoundsMethod.isAccessible = true
+
+                val width = til.width
+                val height = 0
+                setCollapsedBoundsMethod.invoke(collapsingHelper, 0, height, width, height + 40)
+            } catch (e: Exception) {
+                Log.e("TAG", "onCreate: fuck", e)
+            }
+        }
     }
 }

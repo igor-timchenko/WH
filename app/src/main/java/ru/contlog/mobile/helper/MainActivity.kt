@@ -12,6 +12,7 @@ import android.telecom.ConnectionService
 import android.util.Log     // Импорт класса Log из пакета android.util. Класс Log используется для вывода сообщений в лог-систему Android. Это полезно для отладки приложений, отслеживания ошибок и получения информации о выполнении кода. Сообщения могут быть разного уровня (verbose, debug, info, warn, error).
 import android.view.View                     // Базовый класс UI-элемента
 import android.view.WindowInsets             // Для работы с системными вставками (status bar, navigation bar)
+import android.widget.LinearLayout
 // Включает edge-to-edge режим (полноэкранный интерфейс)
 import androidx.activity.enableEdgeToEdge
 // Делегат для получения ViewModel, привязанной к активности
@@ -24,6 +25,8 @@ import androidx.lifecycle.lifecycleScope
 // Утилиты для навигации между фрагментами
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.findNavController
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 // Корутины
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -80,6 +83,7 @@ class MainActivity : AppCompatActivity() {
     // Метод вызывается при создании активности
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         // Включаем edge-to-edge режим (контент под статус-баром и навигационной панелью)
         enableEdgeToEdge()
         // Создаём ViewBinding из layout-файла
@@ -185,6 +189,28 @@ class MainActivity : AppCompatActivity() {
         connectivityManager.unregisterNetworkCallback(networkQueryCallback)
 
         super.onDestroy()
+    }
+
+    private fun applyHintFloatingPosition(til: TextInputLayout) {
+        til.post {
+            try {
+                val helperField = TextInputLayout::class.java.getDeclaredField("collapsingTextHelper")
+                helperField.isAccessible = true
+                val collapsingHelper = helperField[til] as Any
+
+                val setCollapsedBoundsMethod = collapsingHelper.javaClass.getDeclaredMethod(
+                    "setCollapsedBounds", Int::class.java, Int::class.java,
+                    Int::class.java, Int::class.java
+                )
+                setCollapsedBoundsMethod.isAccessible = true
+
+                val width = til.width
+                val height = 0
+                setCollapsedBoundsMethod.invoke(collapsingHelper, 0, height, width, height + 40)
+            } catch (e: Exception) {
+                Log.e("TAG", "onCreate: fuck", e)
+            }
+        }
     }
 
     // Сопутствующий объект с константами класса
