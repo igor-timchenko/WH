@@ -21,6 +21,7 @@ import ru.contlog.mobile.helper.model.Product
 import androidx.core.view.isGone
 // LayoutManager для вложенного RecyclerView
 import androidx.recyclerview.widget.LinearLayoutManager
+import ru.contlog.mobile.helper.model.ProductPlace
 
 // Адаптер для RecyclerView, отображающий список продуктов.
 // Принимает callback onChildScrollRequested для управления прокруткой вложенного списка.
@@ -83,7 +84,8 @@ class ProductsRVAdapter(val onChildScrollRequested: (Boolean) -> Unit) :
             binding.expansionIndicator.visibility = View.VISIBLE
 
             // Устанавливаем код продукта
-            binding.productCode.text = product.productCode
+            binding.productCode.text = if (product.places.isEmpty()) {product.places[0].code} else {product.productCode}
+
             // Устанавливаем числовой код штрихкода
             binding.barcodeCode.text = product.barcodeCode.toString()
             // Устанавливаем название продукта
