@@ -15,7 +15,7 @@
     <string name="smsSentCode">Код должен содержать 5 цифр</string>
 
     <string name="scan_title">Сканируй ШТРИХ-КОД/QR-КОД</string>
-    <string name="search_hint">Поиск по коду, артикулу, штрих-коду товара…</string>
+    <string name="search_hint">Поиск…</string>
     <string name="search_button_text">Поиск</string>
     <string name="errorSendingSMS">Ошибка отправки СМС</string>
     <string name="errorCheckingSMS">Ошибка проверки СМС</string>

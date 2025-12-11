@@ -29,6 +29,8 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment       // Базовый класс фрагмента
 import androidx.fragment.app.viewModels     // Делегат для получения ViewModel, привязанной к фрагменту
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope   // Область корутин, привязанная к жизненному циклу
 import androidx.navigation.fragment.findNavController // Утилита для навигации между фрагментами
 import com.google.android.material.button.MaterialButton
@@ -139,6 +141,7 @@ class ProductInfoFragment : Fragment() {
         binding.root.post {
             startScannerAnimation()
         }
+
 
         // Получаем объект Division из аргументов фрагмента
         // Используем безопасное получение для API 33+ (TIRAMISU)
