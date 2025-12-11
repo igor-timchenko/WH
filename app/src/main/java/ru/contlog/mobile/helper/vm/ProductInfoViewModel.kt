@@ -77,9 +77,11 @@ class ProductInfoViewModel() : ViewModel() {
         result.fold(
             // В случае успеха (получен список Product)
             { productsData ->
+                // Фильтруем продукты: исключаем те, у которых отсутствует массив "Данные" (places пустой)
+                val filteredProducts = productsData.filter { it.places.isNotEmpty() }
                 // Обновляем LiveData на главном (UI) потоке
                 viewModelScope.launch(Dispatchers.Main) {
-                    setProducts(productsData)
+                    setProducts(filteredProducts)
                 }
             },
             // В случае ошибки (например, сетевая ошибка или 404)

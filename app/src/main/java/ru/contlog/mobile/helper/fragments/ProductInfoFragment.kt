@@ -18,6 +18,7 @@ import android.view.LayoutInflater          // Для создания UI из X
 import android.view.View                    // Базовый класс представления
 import android.view.ViewGroup               // Контейнер для View
 import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.result.ActivityResultCallback // Обратный вызов результата активности
@@ -125,6 +126,16 @@ class ProductInfoFragment : Fragment() {
 
         applyHintFloatingPosition(binding.search1)
 
+        // Обработчик клика вне поля поиска для скрытия клавиатуры
+        binding.root.setOnClickListener {
+            hideKeyboard()
+        }
+        
+        // Исключаем контейнер поиска из обработки клика корневого layout
+        binding.searchContainer.setOnClickListener {
+            // Не скрываем клавиатуру при клике на контейнер поиска
+        }
+
         binding.root.post {
             startScannerAnimation()
         }
@@ -185,6 +196,8 @@ class ProductInfoFragment : Fragment() {
 
         // 🔹 ОБНОВЛЁННЫЙ ОБРАБОТЧИК: проверка интернета перед сканированием
         binding.scan.setOnClickListener {
+            // Скрываем клавиатуру при клике на кнопку сканирования
+            hideKeyboard()
 
             if (!isOnline()) {
                 Toast.makeText(requireContext(), "Ошибка соединения, проверьте подключение!", Toast.LENGTH_SHORT).show()
@@ -202,6 +215,14 @@ class ProductInfoFragment : Fragment() {
         binding.productsList.layoutManager = CustomLinearLayoutManager(
             requireContext()
         )
+        
+        // Обработчик касания на список продуктов для скрытия клавиатуры при клике на пустую область
+        binding.productsList.setOnTouchListener { _, event ->
+            if (event.action == android.view.MotionEvent.ACTION_DOWN) {
+                hideKeyboard()
+            }
+            false // Не перехватываем событие, позволяем прокрутке работать
+        }
 
         // Создаём адаптер RecyclerView с коллбэком для включения/отключения прокрутки
         val adapter = ProductsRVAdapter { enable ->
@@ -563,5 +584,17 @@ class ProductInfoFragment : Fragment() {
                 Log.e("TAG", "onCreate: fuck", e)
             }
         }
+    }
+
+    /**
+     * Скрывает клавиатуру и убирает фокус с поля поиска
+     */
+    private fun hideKeyboard() {
+        val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        val currentFocus = requireActivity().currentFocus
+        if (currentFocus != null) {
+            imm.hideSoftInputFromWindow(currentFocus.windowToken, 0)
+        }
+        searchInput.clearFocus()
     }
 }

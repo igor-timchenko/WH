@@ -84,12 +84,12 @@ class ProductsRVAdapter(val onChildScrollRequested: (Boolean) -> Unit) :
             binding.expansionIndicator.visibility = View.VISIBLE
 
             // Устанавливаем код продукта
-            binding.productCode.text = if (product.places.isEmpty()) {product.places[0].code} else {product.productCode}
+            binding.productCode.text = if (product.places.isNotEmpty()) {product.places[0].code} else {""}
 
             // Устанавливаем числовой код штрихкода
-            binding.barcodeCode.text = product.barcodeCode.toString()
+            binding.barcodeCode.text = if (product.places.isNotEmpty()) {product.places[0].article} else {""}
             // Устанавливаем название продукта
-            binding.productName.text = product.productLinkString
+            binding.productName.text = if (product.places.isNotEmpty()) {product.places[0].nomenclatureString} else {""}
 
             // Настраиваем LayoutManager для вложенного RecyclerView (места хранения)
             binding.productPlaces.layoutManager = LinearLayoutManager(
@@ -135,7 +135,7 @@ class ProductsRVAdapter(val onChildScrollRequested: (Boolean) -> Unit) :
             } else {
                 // Устанавливаем заголовок с количеством мест
                 binding.expansionTitle.text =
-                    binding.root.context.getString(R.string.title_places_exp, count, product.unitName)
+                    binding.root.context.getString(R.string.title_places_exp, count, product.unitName ?: "")
                 // Настраиваем обработчик клика по заголовку для раскрытия/скрытия списка мест
                 binding.expansionHeader.setOnClickListener {
                     // Переключаем видимость контента
@@ -166,7 +166,7 @@ class ProductsRVAdapter(val onChildScrollRequested: (Boolean) -> Unit) :
                 // Устанавливаем адаптер для вложенного списка мест
                 // Места сортируются так, чтобы основное место отображалось первым
                 binding.productPlaces.adapter =
-                    ProductPlacesRVAdapter(product.unitName, product.places.sortedBy {
+                    ProductPlacesRVAdapter(product.unitName ?: "", product.places.sortedBy {
                         !it.primaryPlace // primaryPlace = true → !true = false → идёт раньше false
                     })
             }

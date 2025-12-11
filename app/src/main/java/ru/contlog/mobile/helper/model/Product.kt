@@ -25,32 +25,32 @@ data class Product(
     @SerialName("ОбъектUID") val productUID: String,
 
     // Текущее состояние продукта (например, "Активен", "Архивный"). JSON-ключ: "Состояние"
-    @SerialName("Состояние") val state: String,
+    @SerialName("Состояние") val state: String?,
 
     // Целочисленный код штрихкода. JSON-ключ: "КодШК"
-    @SerialName("КодШК") val barcodeCode: Int,
+    @SerialName("КодШК") val barcodeCode: Int?,
 
     // Код продукта в виде строки (внутренний идентификатор в системе). JSON-ключ: "КодОбъекта"
-    @SerialName("КодОбъекта") val productCode: String,
+    @SerialName("КодОбъекта") val productCode: String?,
 
     // Строка штрихкода (например, "1234567890123"). JSON-ключ: "Штрихкод"
-    @SerialName("Штрихкод") val barcode: String,
+    @SerialName("Штрихкод") val barcode: String?,
 
     // Название единицы измерения в человекочитаемом виде (например, "шт", "кг"). JSON-ключ: "ЕдиницаИзмеренияСтрокой"
-    @SerialName("ЕдиницаИзмеренияСтрокой") val unitName: String,
+    @SerialName("ЕдиницаИзмеренияСтрокой") val unitName: String?,
 
     // Строковое представление ссылки на объект в системе (например, GUID или путь). JSON-ключ: "СсылкаОбъектСтрокой"
-    @SerialName("СсылкаОбъектСтрокой") val productLinkString: String,
+    @SerialName("СсылкаОбъектСтрокой") val productLinkString: String?,
 
     // Дата и время создания записи. Используется тип kotlinx.datetime.LocalDateTime.        
     // JSON-ключ: "ДатаСоздания"
-    @SerialName("ДатаСоздания") val createdOn: LocalDateTime,
+    @SerialName("ДатаСоздания") val createdOn: LocalDateTime?,
 
     // Тип единицы измерения (например, "Штуки", "Метры"). JSON-ключ: "Тип"
-    @SerialName("Тип") val unitType: String,
+    @SerialName("Тип") val unitType: String?,
 
     // Коэффициент штрихкода (например, сколько единиц товара содержится в одном штрихкоде). JSON-ключ: "КоэффициентШК"
-    @SerialName("КоэффициентШК") val skCoefficient: Int,
+    @SerialName("КоэффициентШК") val skCoefficient: Int?,
 
     // Список мест хранения или размещения продукта. Каждый элемент — объект ProductPlace.
     // JSON-ключ: "Данные"
