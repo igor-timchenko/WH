@@ -118,9 +118,12 @@ class MainActivity : AppCompatActivity() {
             // Получаем NavController через extension функцию на View
             val navController = binding.fragmentContainerView.findNavController()
 
-            // Если пользователь уже авторизован (apiAuthData не null) — перенаправляем на экран рабочих площадок
-            if (viewModel.apiAuthData != null) {
-                navController.navigate(R.id.action_loginFragment_to_workSitesFragment)
+            // Избегаем навигации, если мы уже на нужном экране
+            if (navController.currentDestination?.id != R.id.workSitesFragment && navController.currentDestination?.id != R.id.profileFragment && navController.currentDestination?.id != R.id.productInfoFragment && navController.currentDestination?.id != R.id.loginFragment) {
+                // Если пользователь уже авторизован (apiAuthData не null) — перенаправляем на экран рабочих площадок
+                if (viewModel.apiAuthData != null) {
+                    navController.navigate(R.id.action_loginFragment_to_workSitesFragment)
+                }
             }
 
             // Настраиваем обработчик нажатий на элементы нижней навигационной панели

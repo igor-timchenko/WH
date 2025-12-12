@@ -46,7 +46,7 @@ android {
         }
 
         debug {
-            buildConfigField("String", "API_HOST", "\"https://pyapi.contlog.ru\"")
+            buildConfigField("String", "API_HOST", "\"http://local.netcraze.pro:800\"")
             // http://local.netcraze.pro:800  -  Локальный сервер (Прописан в дебаге)
             // https://pyapi.contlog.ru  -  Основной сервер (Прописан в релизе)
         }
