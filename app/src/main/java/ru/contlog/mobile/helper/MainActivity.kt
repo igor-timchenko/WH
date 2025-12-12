@@ -115,7 +115,7 @@ class MainActivity : AppCompatActivity() {
         // Откладываем получение NavController до полной инициализации FragmentContainerView
         // Это предотвращает ошибку инициализации FragmentContainerView
         binding.fragmentContainerView.post {
-            // Получаем NavController через extension функцию на View
+            // Получаем NavController через extension функцию на View.
             val navController = binding.fragmentContainerView.findNavController()
 
             // Избегаем навигации, если мы уже на нужном экране
