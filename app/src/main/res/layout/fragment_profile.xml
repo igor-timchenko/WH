@@ -146,5 +146,32 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/userInfoCard" />
 
+        <!-- БЛОК СКАНИРОВАНИЯ -->
+        <LinearLayout
+            android:id="@+id/scannerContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="260dp"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="95dp"
+            android:visibility="visible"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="MissingConstraints"
+            tools:visibility="visible">
+
+            <!-- ТЕКСТ "КОНТИНЕНТ" -->
+            <TextView
+                android:id="@+id/scanTitle1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="@string/scan_title1"
+                android:textSize="48sp"
+                android:textStyle="bold"
+                android:ellipsize="none"
+                android:maxLines="1"
+                app:autoSizeTextType="uniform" />
+        </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

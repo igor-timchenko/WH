@@ -28,6 +28,16 @@ import ru.contlog.mobile.helper.vm.AppViewModel // Основной ViewModel с
 import ru.contlog.mobile.helper.vm.factories.AppViewModelFactory // Фабрика ViewModel (здесь не используется)
 import kotlin.getValue                  // Не используется напрямую, но может быть для делегатов
 
+import android.graphics.Color
+import android.os.Handler
+import android.os.Looper
+
+import android.view.animation.LinearInterpolator
+import android.animation.ObjectAnimator
+import android.widget.TextView
+
+import kotlinx.coroutines.delay
+
 // Фрагмент профиля пользователя
 class ProfileFragment : Fragment() {
     // ViewBinding для доступа к UI-элементам без findViewById
@@ -49,6 +59,44 @@ class ProfileFragment : Fragment() {
     // Вызывается после создания View — здесь настраиваем UI и подписываемся на данные
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val text = getString(R.string.scan_title1) // например, "КОНТИНЕНТ"
+        animateTextTyping(binding.scanTitle1, text, delayMillis = 150)
+
+        // В onCreateView или onViewCreated:
+        val scanTitle = binding.scanTitle1
+        val colors = intArrayOf(
+            Color.BLUE,
+            Color.RED,
+            Color.BLACK
+        )
+        var currentColorIndex = 0
+
+        val handler = Handler(Looper.getMainLooper())
+        val runnable = object : Runnable {
+            override fun run() {
+                // Плавная анимация смены цвета
+                val animator = ObjectAnimator.ofObject(
+                    scanTitle,
+                    "textColor",
+                    android.animation.ArgbEvaluator(),
+                    scanTitle.currentTextColor,
+                    colors[currentColorIndex]
+                )
+                animator.duration = 500 // 0.5 сек на смену цвета
+                animator.interpolator = LinearInterpolator()
+                animator.start()
+
+                // Переход к следующему цвету
+                currentColorIndex = (currentColorIndex + 1) % colors.size
+
+                // Повтор каждые 2 секунды
+                handler.postDelayed(this, 2000)
+            }
+        }
+
+        // Запуск анимации
+        handler.post(runnable)
 
         /*  Убрал ошибку при осутствии интернета
         // Подписка на ошибки — показываем только ошибку, скрываем профиль
@@ -118,6 +166,19 @@ class ProfileFragment : Fragment() {
             // Скрываем индикатор обновления на главном потоке
             launch(Dispatchers.Main) {
                 binding.refresh.isRefreshing = false
+            }
+        }
+    }
+    private fun animateTextTyping(
+        textView: TextView,
+        fullText: String,
+        delayMillis: Long = 100 // задержка между буквами
+    ) {
+        textView.text = ""
+        lifecycleScope.launch {
+            for (i in 1..fullText.length) {
+                delay(delayMillis)
+                textView.text = fullText.substring(0, i)
             }
         }
     }
