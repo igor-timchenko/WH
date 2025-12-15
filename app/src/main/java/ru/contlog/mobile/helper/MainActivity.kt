@@ -1,7 +1,9 @@
 package ru.contlog.mobile.helper
 
 // Импорты системных и вспомогательных классов Android
+import android.app.Activity
 import android.content.Context
+import android.content.pm.ActivityInfo
 import android.net.ConnectivityManager // Импорт класса ConnectivityManager из пакета android.net. ConnectivityManager - это системный сервис Android, который предоставляет информацию о состоянии подключения к сети (Wi-Fi, мобильный интернет и т.д.) и управляет этими подключениями.
 import android.net.Network          // Импорт класса Network из пакета android.net. Network представляет собой конкретное сетевое подключение на устройстве. Он используется, например, в колбэках ConnectivityManager.NetworkCallback для получения информации о конкретной сети, которая изменила состояние.
 import android.net.NetworkCapabilities  // Импорт класса NetworkCapabilities из пакета android.net. NetworkCapabilities содержит информацию о возможностях (capabilities) и свойствах конкретного сетевого подключения (Network). Позволяет проверить, например, поддерживает ли сеть интернет (NET_CAPABILITY_INTERNET) или является VPN (NET_CAPABILITY_VPN).
@@ -118,12 +120,12 @@ class MainActivity : AppCompatActivity() {
             // Получаем NavController через extension функцию на View.
             val navController = binding.fragmentContainerView.findNavController()
 
-            // Избегаем навигации, если мы уже на нужном экране
-            if (navController.currentDestination?.id != R.id.workSitesFragment && navController.currentDestination?.id != R.id.profileFragment && navController.currentDestination?.id != R.id.productInfoFragment && navController.currentDestination?.id != R.id.loginFragment) {
-                // Если пользователь уже авторизован (apiAuthData не null) — перенаправляем на экран рабочих площадок
-                if (viewModel.apiAuthData != null) {
-                    navController.navigate(R.id.action_loginFragment_to_workSitesFragment)
-                }
+            // Отключаем автоповот
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+
+            // Если пользователь уже авторизован (apiAuthData не null) — перенаправляем на экран рабочих площадок
+            if (viewModel.apiAuthData != null) {
+                navController.navigate(R.id.action_loginFragment_to_workSitesFragment)
             }
 
             // Настраиваем обработчик нажатий на элементы нижней навигационной панели
