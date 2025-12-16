@@ -125,7 +125,27 @@ class MainActivity : AppCompatActivity() {
 
             // Если пользователь уже авторизован (apiAuthData не null) — перенаправляем на экран рабочих площадок
             if (viewModel.apiAuthData != null) {
-                navController.navigate(R.id.action_loginFragment_to_workSitesFragment)
+                val currentDestination = navController.currentDestination?.id
+                // Используем безопасную навигацию в зависимости от текущего фрагмента
+                when (currentDestination) {
+                    R.id.loginFragment -> {
+                        navController.navigate(R.id.action_loginFragment_to_workSitesFragment)
+                    }
+                    R.id.productInfoFragment -> {
+                        navController.navigate(R.id.action_productInfoFragment_to_workSitesFragment)
+                    }
+                    R.id.profileFragment -> {
+                        navController.navigate(R.id.action_profileFragment_to_workSitesFragment)
+                    }
+                    R.id.workSitesFragment -> {
+                        // Уже на нужном экране, ничего не делаем
+                    }
+                    else -> {
+                        // Для неизвестных фрагментов не выполняем навигацию
+                        // Пользователь уже авторизован и может сам перейти на нужный экран
+                        Log.d(TAG, "Пользователь авторизован, но текущий destination ($currentDestination) не требует автоматической навигации")
+                    }
+                }
             }
 
             // Настраиваем обработчик нажатий на элементы нижней навигационной панели
