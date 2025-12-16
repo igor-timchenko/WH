@@ -48,8 +48,7 @@ class ProfileFragment : Fragment() {
 
     // Вызывается после создания View — здесь настраиваем UI и подписываемся на данные
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
+        super.onViewCreated(view, savedInstanceState)//hfj
         /*  Убрал ошибку при осутствии интернета
         // Подписка на ошибки — показываем только ошибку, скрываем профиль
         viewModel.errors.observe(viewLifecycleOwner) { errors ->
