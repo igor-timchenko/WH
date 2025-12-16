@@ -15,6 +15,7 @@ import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import android.util.Log                     // Для логирования отладочной информации
 import android.view.LayoutInflater          // Для создания UI из XML-разметки
+import android.view.KeyEvent
 import android.view.View                    // Базовый класс представления
 import android.view.ViewGroup               // Контейнер для View
 import android.view.inputmethod.EditorInfo
@@ -23,6 +24,8 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.result.ActivityResultCallback // Обратный вызов результата активности
 import android.graphics.Color
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.animation.LinearInterpolator
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -170,6 +173,50 @@ class ProductInfoFragment : Fragment() {
         // 🔹 ИНИЦИАЛИЗАЦИЯ ЭЛЕМЕНТОВ ПОИСКА
         searchInput = binding.searchInput
         searchButton = binding.searchButton
+
+        // 🔹 ПЕРЕХВАТ ВВОДА ОТ BLUETOOTH-СКАНЕРА НА КОРНЕВОМ VIEW
+        // Делаем корневой view способным получать фокус для перехвата событий клавиатуры
+        binding.root.isFocusableInTouchMode = true
+        
+        // Перехватываем события клавиатуры на корневом view
+        binding.root.setOnKeyListener { _, keyCode, event ->
+            // Обрабатываем только нажатия клавиш (не отпускания)
+            if (event.action == KeyEvent.ACTION_DOWN) {
+                // Если поле поиска не в фокусе, устанавливаем фокус и перенаправляем ввод
+                if (!searchInput.hasFocus()) {
+                    // Устанавливаем фокус на поле поиска
+                    searchInput.requestFocus()
+                    // Если это не служебная клавиша (Enter, Back и т.д.), перенаправляем событие в поле поиска
+                    if (keyCode != KeyEvent.KEYCODE_ENTER && 
+                        keyCode != KeyEvent.KEYCODE_BACK && 
+                        keyCode != KeyEvent.KEYCODE_DEL) {
+                        // Перенаправляем событие в поле поиска
+                        searchInput.dispatchKeyEvent(event)
+                        return@setOnKeyListener true
+                    }
+                }
+            }
+            false // Пропускаем событие дальше
+        }
+        
+        // 🔹 ОТСЛЕЖИВАНИЕ НАЧАЛА ВВОДА В ПОЛЕ ПОИСКА
+        // Если ввод начинается, когда поле не в фокусе, устанавливаем фокус
+        searchInput.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                // Не используется
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                // Если текст начал появляться, а поле не в фокусе - устанавливаем фокус
+                if (s != null && s.isNotEmpty() && !searchInput.hasFocus()) {
+                    searchInput.requestFocus()
+                }
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+                // Не используется
+            }
+        })
 
         // 🔹 ОБРАБОТЧИК НАЖАТИЯ КНОПКИ "ПОИСК"
         searchButton.setOnClickListener {
