@@ -188,9 +188,12 @@ class ProductInfoFragment : Fragment() {
         }
 
         // 🔹 ОБРАБОТЧИК НАЖАТИЯ ENTER НА КЛАВИАТУРЕ
-        searchInput.setOnEditorActionListener { _, actionId, _ ->
+        searchInput.setOnEditorActionListener { view, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                searchButton.performClick() // Имитируем клик по кнопке
+                // Скрываем клавиатуру перед выполнением поиска
+                hideKeyboard()
+                // Имитируем клик по кнопке
+                searchButton.performClick()
                 true
             } else {
                 false
@@ -594,10 +597,17 @@ class ProductInfoFragment : Fragment() {
      */
     private fun hideKeyboard() {
         val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        val currentFocus = requireActivity().currentFocus
-        if (currentFocus != null) {
-            imm.hideSoftInputFromWindow(currentFocus.windowToken, 0)
+        // Используем windowToken из searchInput, если он инициализирован и в фокусе
+        val viewToHide = if (::searchInput.isInitialized && searchInput.hasFocus()) {
+            searchInput
+        } else {
+            requireActivity().currentFocus
         }
-        searchInput.clearFocus()
+        if (viewToHide != null && viewToHide.windowToken != null) {
+            imm.hideSoftInputFromWindow(viewToHide.windowToken, 0)
+        }
+        if (::searchInput.isInitialized) {
+            searchInput.clearFocus()
+        }
     }
 }
