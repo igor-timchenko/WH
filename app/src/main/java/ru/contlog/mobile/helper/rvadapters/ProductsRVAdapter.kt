@@ -135,7 +135,7 @@ class ProductsRVAdapter(val onChildScrollRequested: (Boolean) -> Unit) :
             } else {
                 // Устанавливаем заголовок с количеством мест
                 binding.expansionTitle.text =
-                    binding.root.context.getString(R.string.title_places_exp, count, product.unitName ?: "")
+                    binding.root.context.getString(R.string.title_places_exp, count, product.unitName ?: "шт")
                 // Настраиваем обработчик клика по заголовку для раскрытия/скрытия списка мест
                 binding.expansionHeader.setOnClickListener {
                     // Переключаем видимость контента
@@ -166,7 +166,7 @@ class ProductsRVAdapter(val onChildScrollRequested: (Boolean) -> Unit) :
                 // Устанавливаем адаптер для вложенного списка мест
                 // Места сортируются так, чтобы основное место отображалось первым
                 binding.productPlaces.adapter =
-                    ProductPlacesRVAdapter(product.unitName ?: "", product.places.sortedBy {
+                    ProductPlacesRVAdapter(product.unitName ?: "шт", product.places.sortedBy {
                         !it.primaryPlace // primaryPlace = true → !true = false → идёт раньше false
                     })
             }
