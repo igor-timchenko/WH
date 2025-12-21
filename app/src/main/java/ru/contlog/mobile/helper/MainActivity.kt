@@ -86,6 +86,9 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // Инициализируем Api с application context для получения версии приложения
+        Api.initialize(this)
+
         // Включаем edge-to-edge режим (контент под статус-баром и навигационной панелью)
         enableEdgeToEdge()
         // Создаём ViewBinding из layout-файла
@@ -232,8 +235,21 @@ class MainActivity : AppCompatActivity() {
                 val width = til.width
                 val height = 0
                 setCollapsedBoundsMethod.invoke(collapsingHelper, 0, height, width, height + 40)
+            } catch (e: NoSuchMethodException) {
+                // Метод не найден - нормально для release-сборок с обфускацией R8/ProGuard
+                if (BuildConfig.DEBUG) {
+                    Log.d(TAG, "applyHintFloatingPosition: метод setCollapsedBounds не доступен (обфускация)")
+                }
+            } catch (e: NoSuchFieldException) {
+                // Поле не найдено - нормально для release-сборок с обфускацией
+                if (BuildConfig.DEBUG) {
+                    Log.d(TAG, "applyHintFloatingPosition: поле collapsingTextHelper не доступно (обфускация)")
+                }
             } catch (e: Exception) {
-                Log.e("TAG", "onCreate: fuck", e)
+                // Другие ошибки логируем только в debug-режиме
+                if (BuildConfig.DEBUG) {
+                    Log.e(TAG, "applyHintFloatingPosition: ошибка при настройке hint position", e)
+                }
             }
         }
     }

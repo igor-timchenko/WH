@@ -1,5 +1,7 @@
 package ru.contlog.mobile.helper.repo
 
+import android.content.Context
+import android.content.pm.PackageManager
 import android.util.Log
 import kotlinx.serialization.json.Json
 import okhttp3.FormBody
@@ -16,6 +18,10 @@ import ru.contlog.mobile.helper.model.GenericApiResponse
 import ru.contlog.mobile.helper.model.ProductInfoParams
 import ru.contlog.mobile.helper.model.UserData
 import ru.contlog.mobile.helper.utils.await
+import java.security.cert.X509Certificate
+import javax.net.ssl.SSLContext
+import javax.net.ssl.TrustManager
+import javax.net.ssl.X509TrustManager
 
 object Api {
     /**
@@ -27,6 +33,22 @@ object Api {
      * Log.d(TAG, "Запрос отправлен")
      */
     const val TAG = "Contlog.Api"
+
+    /**
+     * Application context для использования в методах Api.
+     * Инициализируется через метод initialize() при старте приложения.
+     */
+    private lateinit var applicationContext: Context
+
+    /**
+     * Инициализирует Api объект с application context.
+     * Должен быть вызван один раз при старте приложения (в Application или MainActivity).
+     *
+     * @param context Context приложения (рекомендуется использовать applicationContext)
+     */
+    fun initialize(context: Context) {
+        applicationContext = context.applicationContext
+    }
 
     /**
      * Константа для базового URL-адреса API.
@@ -56,7 +78,39 @@ object Api {
      *   .addInterceptor(loggingInterceptor)
      *   .build()
      */
-    private val client = OkHttpClient()
+    private val client: OkHttpClient by lazy {
+        val trustAllCerts = arrayOf<TrustManager>(object : X509TrustManager {
+            override fun checkClientTrusted(chain: Array<X509Certificate>, authType: String) {}
+            override fun checkServerTrusted(chain: Array<X509Certificate>, authType: String) {}
+            override fun getAcceptedIssuers(): Array<X509Certificate> = arrayOf()
+        })
+
+        val sslContext = SSLContext.getInstance("SSL")
+        sslContext.init(null, trustAllCerts, java.security.SecureRandom())
+        val sslSocketFactory = sslContext.socketFactory
+
+        OkHttpClient.Builder()
+            .sslSocketFactory(sslSocketFactory, trustAllCerts[0] as X509TrustManager)
+            .hostnameVerifier { _, _ -> true }
+            .build()
+    }
+
+    /**
+     * Получает версию приложения в формате "versionName.versionCode".
+     * Используется для отправки в заголовке X-App-Version.
+     *
+     * @return Строка с версией приложения, например "1.0.123"
+     */
+    private fun getAppVersion(): String {
+        return try {
+            val packageInfo = applicationContext.packageManager.getPackageInfo(applicationContext.packageName, 0)
+            val versionName = packageInfo.versionName ?: "unknown"
+            val versionCode = packageInfo.longVersionCode.toString()
+            "$versionName.$versionCode"
+        } catch (e: PackageManager.NameNotFoundException) {
+            "unknown.0"
+        }
+    }
 
     /**
      * Конфигурированный экземпляр Json-десериализатора (из библиотеки kotlinx.serialization).
@@ -151,7 +205,9 @@ object Api {
                 // 3. Собираем HTTP-запрос
                 val request = Request.Builder()
                     .url("$API_ENDPOINT/auth/v2/get_sms")
-                    .addHeader("Application-Name", "WHAndroid-MobileCabinet")
+                    .addHeader("X-App-Version", getAppVersion())
+                    .addHeader("Application-Name", "ProAndroid-MobileCabinet")
+                    .addHeader("User-Agent", "ProAndroid-MobileCabinet/${getAppVersion()}")
                     .post(body)
                     .build()
 
@@ -232,7 +288,9 @@ object Api {
                 // 3. Собираем HTTP-запрос к эндпоинту проверки кода
                 val request = Request.Builder()
                     .url("$API_ENDPOINT/auth/v2/check_sms")
-                    .addHeader("Application-Name", "WHAndroid-MobileCabinet")
+                    .addHeader("X-App-Version", getAppVersion())
+                    .addHeader("Application-Name", "ProAndroid-MobileCabinet")
+                    .addHeader("User-Agent", "ProAndroid-MobileCabinet/${getAppVersion()}")
                     .post(body)
                     .build()
 
@@ -322,6 +380,9 @@ object Api {
                 // 2. Создаём GET-запрос без тела
                 val request = Request.Builder()
                     .url(url)
+                    .addHeader("X-App-Version", getAppVersion())
+                    .addHeader("Application-Name", "ProAndroid-MobileCabinet")
+                    .addHeader("User-Agent", "ProAndroid-MobileCabinet/${getAppVersion()}")
                     .build()
 
                 // 3. Выполняем HTTP-запрос и ждём ответа
@@ -408,6 +469,9 @@ object Api {
                 // 2. Создаём GET-запрос без тела
                 val request = Request.Builder()
                     .url(url)
+                    .addHeader("X-App-Version", getAppVersion())
+                    .addHeader("Application-Name", "ProAndroid-MobileCabinet")
+                    .addHeader("User-Agent", "ProAndroid-MobileCabinet/${getAppVersion()}")
                     .build()
 
                 // 3. Выполняем HTTP-запрос и ожидаем ответ
@@ -509,6 +573,9 @@ object Api {
                     // 4. Создаём POST-запрос с телом
                     val request = Request.Builder()
                         .url(url)
+                        .addHeader("X-App-Version", getAppVersion())
+                        .addHeader("Application-Name", "ProAndroid-MobileCabinet")
+                        .addHeader("User-Agent", "ProAndroid-MobileCabinet/${getAppVersion()}")
                         .post(body)
                         .build()
 

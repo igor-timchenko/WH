@@ -46,6 +46,7 @@ import kotlinx.coroutines.Dispatchers        // Диспетчеры корут�
 import kotlinx.coroutines.launch            // Запуск корутины
 import kotlinx.coroutines.withContext      // Переключение контекста корутины
 import kotlinx.datetime.LocalDateTime       // Модель даты и времени (kotlinx-datetime)
+import ru.contlog.mobile.helper.BuildConfig // Конфигурация сборки
 import ru.contlog.mobile.helper.R           // Сгенерированный класс ресурсов
 import ru.contlog.mobile.helper.databinding.FragmentProductInfoBinding // ViewBinding для этого фрагмента
 import ru.contlog.mobile.helper.exceptions.ApiRequestException // Исключения API
@@ -83,6 +84,7 @@ class ProductInfoFragment : Fragment() {
 
     // Константы для анимации
     private companion object {
+        const val TAG = "Contlog.ProductInfoFragment" // Тег для логирования
         const val ANIMATION_DURATION = 300L // Длительность анимации в миллисекундах
         const val PULSE_DURATION = 1000L // Длительность пульсации в миллисекундах
     }
@@ -633,8 +635,21 @@ class ProductInfoFragment : Fragment() {
                 val width = til.width
                 val height = 0
                 setCollapsedBoundsMethod.invoke(collapsingHelper, 0, height, width, height + 40)
+            } catch (e: NoSuchMethodException) {
+                // Метод не найден - нормально для release-сборок с обфускацией R8/ProGuard
+                if (BuildConfig.DEBUG) {
+                    Log.d(TAG, "applyHintFloatingPosition: метод setCollapsedBounds не доступен (обфускация)")
+                }
+            } catch (e: NoSuchFieldException) {
+                // Поле не найдено - нормально для release-сборок с обфускацией
+                if (BuildConfig.DEBUG) {
+                    Log.d(TAG, "applyHintFloatingPosition: поле collapsingTextHelper не доступно (обфускация)")
+                }
             } catch (e: Exception) {
-                Log.e("TAG", "onCreate: fuck", e)
+                // Другие ошибки логируем только в debug-режиме
+                if (BuildConfig.DEBUG) {
+                    Log.e(TAG, "applyHintFloatingPosition: ошибка при настройке hint position", e)
+                }
             }
         }
     }

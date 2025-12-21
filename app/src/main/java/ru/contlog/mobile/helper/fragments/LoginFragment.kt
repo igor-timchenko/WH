@@ -188,8 +188,9 @@ class LoginFragment : Fragment() {
         try {
             // Получаем информацию о пакете (включая версию)
             val packageInfo = requireContext().packageManager.getPackageInfo(requireContext().packageName, 0)
-            val version = packageInfo.versionName ?: "неизвестна"
-            binding.appVersionText.text = "Версия: $version"
+            val versionName = packageInfo.versionName ?: "неизвестна"
+            val versionCode = packageInfo.longVersionCode.toString()
+            binding.appVersionText.text = "Версия: $versionName.$versionCode"
         } catch (e: Exception) {
             // На случай ошибки (например, пакет удалён) — показываем заглушку
             binding.appVersionText.text = "Версия: неизвестна"

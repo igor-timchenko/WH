@@ -10,10 +10,10 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = file("D:/File SSD C=D/Документы/Supplier_CONTINENT/Keys/SUPPLIER_CONTINENT2.jks")
-            storePassword = "123456"
-            keyAlias = "mykey"
-            keyPassword = "123456"
+            storeFile = file("/Users/vladimirkunzin/Documents/Project/AndroidStudio/app_keys/pro_contlog.jks")
+            storePassword = "NW#q#s6jQ2T6QHM~"
+            keyAlias = "key0"
+            keyPassword = "?@A#\$ACeB*b2T}ej"
         }
     }
 
@@ -21,8 +21,8 @@ android {
         applicationId = "ru.contlog.mobile.helper"
         minSdk = 29
         targetSdk = 36
-        versionCode = 2
-        versionName = "1.0.2"
+        versionCode = 3
+        versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -32,14 +32,10 @@ android {
             // Enables code-related app optimization.
             isMinifyEnabled = true
 
-            // Enables resource shrinking.
-//            isShrinkResources = true
-
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-//            signingConfig = signingConfigs.getByName("release")
 
             buildConfigField("String", "API_HOST", "\"https://pyapi.contlog.ru\"")
             signingConfig = signingConfigs.getByName("release")
@@ -47,8 +43,6 @@ android {
 
         debug {
             buildConfigField("String", "API_HOST", "\"http://local.netcraze.pro:800\"")
-            // http://local.netcraze.pro:800  -  Локальный сервер (Прописан в дебаге)
-            // https://pyapi.contlog.ru  -  Основной сервер (Прописан в релизе)
         }
     }
 
