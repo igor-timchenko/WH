@@ -79,7 +79,7 @@
             android:ellipsize="none"
             android:maxLines="1"
             android:text="@string/scan_title"
-            android:textColor="@android:color/black"
+            android:textColor="#FF666666"
             android:textSize="18sp"
             app:autoSizeTextType="uniform" />
 
