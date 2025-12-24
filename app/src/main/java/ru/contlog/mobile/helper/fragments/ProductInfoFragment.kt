@@ -611,12 +611,14 @@ class ProductInfoFragment : Fragment() {
     }
 
     /**
-     * Останавливает анимацию и скрывает линию.
+     * Останавливает анимацию и скрывает линию, камеру и надпись.
      */
     private fun stopScannerAnimation() {
         scannerLineAnimator?.cancel()
         scannerLineAnimator = null
         scannerLine.visibility = View.GONE
+        scanTitle.visibility = View.GONE
+        cameraIcon.visibility = View.GONE
     }
 
     private fun applyHintFloatingPosition(til: TextInputLayout) {
