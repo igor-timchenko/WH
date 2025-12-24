@@ -44,7 +44,7 @@
         android:id="@+id/scannerContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="260dp"
+        android:layout_marginTop="200dp"
         android:gravity="center"
         android:orientation="vertical"
         android:padding="24dp"
@@ -87,17 +87,17 @@
             android:id="@+id/scanTitle1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
+            android:layout_marginBottom="26dp"
             android:ellipsize="none"
-            android:maxLines="1"
-            android:textSize="18sp"
+            android:maxLines="7"
+            android:textSize="80sp"
             app:autoSizeTextType="uniform" />
 
         <TextView
             android:id="@+id/scanTitle2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
+
             android:ellipsize="none"
             android:maxLines="1"
             android:text="@string/scan_title2"
@@ -109,7 +109,7 @@
             android:id="@+id/arrow_drop_down"
             android:layout_width="96dp"
             android:layout_height="96dp"
-            android:layout_marginBottom="25dp"
+            android:layout_marginBottom="5dp"
             android:src="@drawable/outline_keyboard_double_arrow_down_24"
             tools:ignore="ContentDescription" />
 
