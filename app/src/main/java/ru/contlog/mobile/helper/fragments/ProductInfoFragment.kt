@@ -73,6 +73,8 @@ class ProductInfoFragment : Fragment() {
     private lateinit var scannerLine: View
     private lateinit var scanTitle: TextView
     private lateinit var cameraIcon: ImageView
+    private lateinit var arrow_drop_down: ImageView
+    private lateinit var scanTitle2: TextView
 
 
 
@@ -163,6 +165,8 @@ class ProductInfoFragment : Fragment() {
         scannerLine = binding.scannerLine
         scanTitle = binding.scanTitle
         cameraIcon = binding.camera
+        arrow_drop_down = binding.arrowDropDown
+        scanTitle2 = binding.scanTitle2
 
 
         // Устанавливаем название тулбара как имя подразделения
@@ -619,6 +623,8 @@ class ProductInfoFragment : Fragment() {
         scannerLine.visibility = View.GONE
         scanTitle.visibility = View.GONE
         cameraIcon.visibility = View.GONE
+        arrow_drop_down.visibility = View.GONE
+        scanTitle2.visibility = View.GONE
     }
 
     private fun applyHintFloatingPosition(til: TextInputLayout) {
