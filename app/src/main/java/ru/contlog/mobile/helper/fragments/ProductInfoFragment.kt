@@ -27,9 +27,11 @@ import android.graphics.Color
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.animation.LinearInterpolator
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment       // Базовый класс фрагмента
 import androidx.fragment.app.viewModels     // Делегат для получения ViewModel, привязанной к фрагменту
 import androidx.lifecycle.LiveData
@@ -70,11 +72,11 @@ class ProductInfoFragment : Fragment() {
     private lateinit var searchButton: MaterialButton
 
     private lateinit var scannerContainer: LinearLayout
+    private lateinit var scannerContainer1: LinearLayout
     private lateinit var scannerLine: View
     private lateinit var scanTitle: TextView
     private lateinit var cameraIcon: ImageView
-    private lateinit var arrow_drop_down: ImageView
-    private lateinit var scanTitle2: TextView
+    private lateinit var scan: Button
 
 
 
@@ -130,8 +132,11 @@ class ProductInfoFragment : Fragment() {
     }
 
     // Настройка UI после создания View
+    @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        binding.close.visibility = View.GONE
 
         applyHintFloatingPosition(binding.search1)
 
@@ -162,11 +167,11 @@ class ProductInfoFragment : Fragment() {
         )
 
         scannerContainer = binding.scannerContainer
+        scannerContainer1 = binding.scannerContainer1
         scannerLine = binding.scannerLine
         scanTitle = binding.scanTitle
         cameraIcon = binding.camera
-        arrow_drop_down = binding.arrowDropDown
-        scanTitle2 = binding.scanTitle2
+        scan = binding.scan
 
 
         // Устанавливаем название тулбара как имя подразделения
@@ -251,6 +256,26 @@ class ProductInfoFragment : Fragment() {
             } else {
                 false
             }
+        }
+
+        // Кнопка Закрыть. Возвращает на начальный экран сканирования
+        binding.close.setOnClickListener {
+            // Сбрасываем предыдущие данные и флаг первой загрузки для новой анимации
+            productViewModel.setProducts(null)
+            // Очищаем предыдущие ошибки перед новой загрузкой
+            productViewModel.clearErrors()
+
+            scannerContainer.visibility = View.VISIBLE
+            scannerContainer1.visibility = View.VISIBLE
+
+            scan.visibility = View.VISIBLE
+            scannerLine.visibility = View.VISIBLE
+            scanTitle.visibility = View.VISIBLE
+            cameraIcon.visibility = View.VISIBLE
+
+            // 🔹 Запустить анимацию
+            startScannerAnimation()
+            binding.close.visibility = View.GONE
         }
 
         // 🔹 ОБНОВЛЁННЫЙ ОБРАБОТЧИК: проверка интернета перед сканированием
@@ -349,6 +374,7 @@ class ProductInfoFragment : Fragment() {
         binding.scan.setOnLongClickListener {
             val data = mock()
             adapter.setData(data)
+            stopScannerAnimation()
             true // потребляется событие
         }
     }
@@ -367,6 +393,7 @@ class ProductInfoFragment : Fragment() {
     // Метод загрузки данных по отсканированному коду
     @SuppressLint("UseKtx")
     private fun loadData(code: String) {
+        binding.close.visibility = View.VISIBLE
         // Сбрасываем предыдущие данные и флаг первой загрузки для новой анимации
         productViewModel.setProducts(null)
         // Очищаем предыдущие ошибки перед новой загрузкой
@@ -623,8 +650,7 @@ class ProductInfoFragment : Fragment() {
         scannerLine.visibility = View.GONE
         scanTitle.visibility = View.GONE
         cameraIcon.visibility = View.GONE
-        arrow_drop_down.visibility = View.GONE
-        scanTitle2.visibility = View.GONE
+        scan.visibility = View.GONE
     }
 
     private fun applyHintFloatingPosition(til: TextInputLayout) {

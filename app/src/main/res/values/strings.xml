@@ -15,7 +15,6 @@
     <string name="smsSentCode">Код должен содержать 5 цифр</string>
 
     <string name="scan_title">Сканируй ШТРИХ-КОД/QR-КОД</string>
-    <string name="scan_title2">НАЖМИ!!! Для начала сканирования!!!</string>
     <string name="search_hint">Поиск…</string>
     <string name="search_button_text">Поиск</string>
     <string name="errorSendingSMS">Ошибка отправки СМС</string>
@@ -39,7 +38,7 @@
     <string name="label_best_before">Срок годности:</string>
     <string name="scanned_label">Отсканировано: %s</string>
     <string name="no_places_found">Ничего не найдено</string>
-    <string name="do_scan_btn_label">Начать сканирование</string>
+    <string name="do_close_btn_label">Закрыть</string>
     <string name="todo">TODO</string>
     <string name="menu_main">Главная</string>
     <string name="menu_profile">Профиль</string>

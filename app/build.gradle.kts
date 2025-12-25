@@ -42,7 +42,7 @@ android {
         }
 
         debug {
-            buildConfigField("String", "API_HOST", "\"http://local.netcraze.pro:800\"")
+            buildConfigField("String", "API_HOST", "\"https://pyapi.contlog.ru\"")
         }
     }
 
